@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { protect } from '../middleware/authMiddleware.js';
+import { authorize } from '../middleware/roleMiddleware.js';
+import { requestReturn, myReturns, managedReturns, updateReturn } from '../controllers/returnController.js';
+const router = Router();
+router.use(protect);
+router.get('/my', myReturns);
+router.post('/', requestReturn);
+router.get('/manage', authorize('admin','vendor'), managedReturns);
+router.put('/:id/status', authorize('admin','vendor'), updateReturn);
+export default router;
