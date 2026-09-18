@@ -8,6 +8,7 @@ import {
   sendPasswordResetEmail,
   sendWelcomeEmail,
 } from "../services/notificationService.js";
+import { clearCsrfCookie, setCsrfCookie } from "../middleware/csrfMiddleware.js";
 
 const publicUser = (user) => ({
   id: user._id,
@@ -25,6 +26,7 @@ const issueTokens = async (user, res) => {
   user.refreshTokenExpires = new Date(Date.now() + cookieOptions.maxAge);
   await user.save();
   res.cookie("refreshToken", refresh, cookieOptions);
+  setCsrfCookie(res);
   return token;
 };
 
@@ -138,6 +140,7 @@ export const logoutUser = async (req, res, next) => {
     }
 
     res.clearCookie("refreshToken", cookieOptions);
+    clearCsrfCookie(res);
 
     res.json({
       success: true,
