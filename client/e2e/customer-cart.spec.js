@@ -46,6 +46,15 @@ test.describe.serial("Customer cart mutation flow", () => {
     }
 
     await expect(page).not.toHaveURL(/\/login$/);
+
+    await expect(
+      page.getByRole("button", {
+        name: "Logout",
+        exact: true,
+      })
+    ).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test.afterAll(async () => {
@@ -57,7 +66,14 @@ test.describe.serial("Customer cart mutation flow", () => {
      * Start with a clean cart.
      */
     await page.goto("/cart");
-    await page.waitForLoadState("networkidle");
+
+    await expect(
+      page.getByRole("heading", {
+        name: /shopping cart/i,
+      })
+    ).toBeVisible({
+      timeout: 10_000,
+    });
 
     let existingRemoveButtons = page.getByRole("button", {
       name: /remove/i,
@@ -82,13 +98,17 @@ test.describe.serial("Customer cart mutation flow", () => {
       await deleteResponsePromise;
 
       await expect
-        .poll(async () => {
-          return await page
-            .getByRole("button", {
-              name: /remove/i,
-            })
-            .count();
-        })
+        .poll(
+          async () =>
+            await page
+              .getByRole("button", {
+                name: /remove/i,
+              })
+              .count(),
+          {
+            timeout: 10_000,
+          }
+        )
         .toBeLessThan(existingCount);
 
       existingRemoveButtons = page.getByRole("button", {
@@ -101,24 +121,39 @@ test.describe.serial("Customer cart mutation flow", () => {
     /*
      * Find a purchasable product.
      */
+    const productsResponsePromise = page
+      .waitForResponse(
+        (response) =>
+          response.url().includes("/api/products") &&
+          response.request().method() === "GET",
+        {
+          timeout: 10_000,
+        }
+      )
+      .catch(() => null);
+
     await page.goto("/products");
-    await page.waitForLoadState("networkidle");
+
+    await productsResponsePromise;
 
     const productLinks = page.locator(
       'a[href^="/products/"]'
     );
+
+    await expect
+      .poll(
+        async () => await productLinks.count(),
+        {
+          timeout: 10_000,
+        }
+      )
+      .toBeGreaterThan(0);
 
     const productCount = await productLinks.count();
 
     console.log(
       `Products found on page: ${productCount}`
     );
-
-    if (productCount === 0) {
-      throw new Error(
-        "No products were found on the products page."
-      );
-    }
 
     let productAdded = false;
 
@@ -132,14 +167,15 @@ test.describe.serial("Customer cart mutation flow", () => {
       }
 
       await page.goto(href);
-      await page.waitForLoadState("networkidle");
 
       const addButton = page.getByRole("button", {
         name: /add to cart/i,
       });
 
       const visible = await addButton
-        .isVisible()
+        .isVisible({
+          timeout: 5000,
+        })
         .catch(() => false);
 
       const enabled = visible
@@ -157,7 +193,7 @@ test.describe.serial("Customer cart mutation flow", () => {
       }
 
       /*
-       * Handle product variants if this product has them.
+       * Handle product variants if present.
        */
       const variantSelect =
         page.getByLabel(/variant/i);
@@ -181,9 +217,7 @@ test.describe.serial("Customer cart mutation flow", () => {
       }
 
       /*
-       * IMPORTANT:
-       * Wait for the cart mutation to finish before
-       * navigating away from ProductDetails.
+       * Wait for cart mutation.
        */
       const cartResponsePromise =
         page.waitForResponse(
@@ -220,25 +254,30 @@ test.describe.serial("Customer cart mutation flow", () => {
     }
 
     /*
-     * Verify cart contains the new item.
+     * Verify cart contains the item.
      */
     await page.goto("/cart");
-    await page.waitForLoadState("networkidle");
 
     await expect(
       page.getByRole("heading", {
         name: /shopping cart/i,
       })
-    ).toBeVisible();
+    ).toBeVisible({
+      timeout: 10_000,
+    });
 
     const removeButtons = page.getByRole("button", {
       name: /remove/i,
     });
 
     await expect
-      .poll(async () => {
-        return await removeButtons.count();
-      })
+      .poll(
+        async () =>
+          await removeButtons.count(),
+        {
+          timeout: 10_000,
+        }
+      )
       .toBeGreaterThan(0);
 
     const countBeforeRemoval =
@@ -249,49 +288,53 @@ test.describe.serial("Customer cart mutation flow", () => {
     );
 
     /*
-     * Remove the item and wait for backend mutation.
+     * Remove item.
      */
-    const removeResponsePromise =
-      page
-        .waitForResponse(
-          (response) =>
-            response.url().includes("/api/cart") &&
-            response.request().method() !== "GET",
-          {
-            timeout: 10_000,
-          }
-        )
-        .catch(() => null);
+    const removeResponsePromise = page
+      .waitForResponse(
+        (response) =>
+          response.url().includes("/api/cart") &&
+          response.request().method() !== "GET",
+        {
+          timeout: 10_000,
+        }
+      )
+      .catch(() => null);
 
     await removeButtons.first().click();
 
     await removeResponsePromise;
 
-    /*
-     * Verify item disappeared.
-     */
     await expect
-      .poll(async () => {
-        return await page
-          .getByRole("button", {
-            name: /remove/i,
-          })
-          .count();
-      })
+      .poll(
+        async () =>
+          await page
+            .getByRole("button", {
+              name: /remove/i,
+            })
+            .count(),
+        {
+          timeout: 10_000,
+        }
+      )
       .toBeLessThan(countBeforeRemoval);
 
     /*
-     * Because we deliberately started with an empty
-     * cart, it should now contain zero products.
+     * We started with an empty cart,
+     * so cart should now be empty.
      */
     await expect
-      .poll(async () => {
-        return await page
-          .getByRole("button", {
-            name: /remove/i,
-          })
-          .count();
-      })
+      .poll(
+        async () =>
+          await page
+            .getByRole("button", {
+              name: /remove/i,
+            })
+            .count(),
+        {
+          timeout: 10_000,
+        }
+      )
       .toBe(0);
   });
 });

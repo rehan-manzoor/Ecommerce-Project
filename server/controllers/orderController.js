@@ -62,7 +62,31 @@ export const createOrder = async (req, res) => {
     const cart = await Cart.findOne({ user: req.user.userId }).populate('items.product');
     if (!cart?.items.length) {
       await refundPayment(payment, payment.amount / 100, 'Cart empty before order creation');
-      return fail(res, 409, 'Cart is empty after payment; a full refund was initiated');
+      const errorMessage = String(error.message || "");
+
+if (/stock/i.test(errorMessage)) {
+  return fail(
+    res,
+    409,
+    "Insufficient stock to complete the order"
+  );
+}
+
+if (/coupon/i.test(errorMessage)) {
+  return fail(
+    res,
+    409,
+    "Coupon is no longer available"
+  );
+}
+
+console.error("Order creation failed:", error);
+
+return fail(
+  res,
+  400,
+  "Unable to create order"
+);
     }
     const snapshot = payment.cartSnapshot || [];
     const itemsNow = cart.items.map((entry) => {
@@ -180,5 +204,13 @@ export const cancelVendorOrder = async (req, res) => {
     order.status = aggregateStatus(order); order.statusHistory.push({ status: order.status, note: 'Cancellation and refund initiated' });
     await order.save(); await notify(order.user, 'refund', 'Cancellation submitted', 'Refund initiated through Stripe', '/orders');
     return res.json({ success: true, data: order });
-  } catch (error) { return fail(res, 502, error.message || 'Stripe refund failed'); }
+  } catch (error) {
+  console.error("Vendor order refund failed:", error);
+
+  return fail(
+    res,
+    502,
+    "Unable to process refund"
+  );
+}
 };

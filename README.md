@@ -1,78 +1,46 @@
 # MERN Multi-Vendor E-Commerce Marketplace
 
-A full-stack multi-vendor e-commerce marketplace built with the MERN stack.
+A full-stack, role-based multi-vendor e-commerce marketplace built with the MERN stack.
 
-The application supports customer shopping flows, vendor management, administrative moderation, secure authentication, cart and wishlist management, order processing, product moderation, returns, refunds, shipping configuration, coupons, reviews, analytics, and automated testing.
-
----
-
-## Tech Stack
-
-### Frontend
-
-- React
-- Vite
-- React Router
-- Axios
-- Context API
-- CSS
-- Vitest
-- React Testing Library
-- Playwright
-- Axe Accessibility Testing
-
-### Backend
-
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- JWT Authentication
-- HttpOnly Cookies
-- bcrypt
-- Zod Validation
-- Multer
-- Stripe integration
-- Express Rate Limit
-- Helmet
-- CORS
+The application provides complete customer shopping flows, vendor product and order management, administrative moderation, Stripe payment processing, refunds and returns, shipping management, secure authentication, accessibility checks, and automated testing.
 
 ---
 
-# Main Features
+## Features
 
-## Customer
+### Customer
 
 Customers can:
 
-- Register
-- Login
-- Logout
+- Register and log in
 - Maintain authenticated sessions
-- View profile
-- Manage addresses
+- Log out securely
+- Manage profile information
+- Manage shipping addresses
 - Browse products
 - View product details
 - Search products
 - Filter and sort products
 - Browse categories
-- Add products to cart
-- Remove products from cart
-- Maintain guest and authenticated carts
-- Add products to wishlist
-- Remove products from wishlist
+- Add and remove cart items
+- Use a guest cart
+- Merge guest cart after login
+- Manage wishlist
 - Apply coupons
 - Select shipping methods
-- Checkout
-- View orders
-- Submit reviews
+- Checkout securely
+- View previous orders
+- Cancel eligible vendor orders
+- Request returns
+- View return requests
+- Submit product reviews
 - Browse vendor storefronts
 
 ---
 
-## Vendor
+### Vendor
 
-Vendors can:
+Approved vendors can:
 
 - Access a dedicated vendor dashboard
 - Manage store information
@@ -80,28 +48,31 @@ Vendors can:
 - Create products
 - Edit products
 - Delete products
-- Manage stock
-- Configure SKU
+- Manage product stock
+- Manage product variants
+- Configure SKU values
 - Configure sale pricing
 - Configure low-stock thresholds
-- Manage product listing status
-- View vendor orders
-- Manage fulfillment
-- Manage returns
+- Manage product availability
+- View vendor-specific orders
+- Process fulfillment
+- Add tracking information
+- Manage eligible return requests
 
-New vendor products are subject to administrative moderation.
+New vendor products require administrative approval before appearing publicly.
 
 ---
 
-## Administrator
+### Administrator
 
-Administrators have access to a dedicated control center.
+Administrators have access to a dedicated marketplace control center.
 
 Admin functionality includes:
 
 - Marketplace overview
-- Vendor management
+- Revenue and order statistics
 - Vendor application moderation
+- Vendor management
 - Product moderation
 - Order management
 - User management
@@ -109,132 +80,61 @@ Admin functionality includes:
 - Category management
 - Coupon management
 - Return management
-- Refund management
+- Refund processing
 - Shipping method management
 - Marketplace analytics
 
 ---
 
-# Product System
+# Technology Stack
 
-Products support information such as:
+## Frontend
 
-- Name
-- Description
-- Brand
-- SKU
-- Base price
-- Sale price
-- Stock
-- Low-stock threshold
-- Category
-- Vendor
-- Listing status
-- Approval status
+- React
+- React Router
+- Vite
+- Axios
+- Context API
+- CSS
+- Stripe.js
+- React Stripe.js
 
-The marketplace supports an administrative product approval workflow.
+## Backend
 
----
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT
+- bcryptjs
+- Zod
+- Multer
+- Stripe
+- Nodemailer
+- Helmet
+- CORS
+- Express Rate Limit
 
-# Authentication & Security
+## Testing
 
-The project includes several security protections.
-
-### Authentication
-
-- JWT-based authentication
-- Short-lived access tokens
-- Refresh token support
-- HttpOnly cookie-based refresh sessions
-- Protected routes
-- Role-based authorization
-- Customer, vendor, and admin access control
-
-### Security
-
-- Helmet security headers
-- CORS configuration
-- Authentication rate limiting
-- Request validation
-- Centralized error handling
-- Password hashing with bcrypt
-- CSRF protection for sensitive authentication operations
-- Secure cookie configuration
-- Role-based backend authorization
+- Vitest
+- React Testing Library
+- Playwright
+- Axe Accessibility Testing
+- Node.js Test Runner
+- Supertest
 
 ---
 
-# CSRF Protection
+# Authentication
 
-Sensitive cookie-authenticated operations use CSRF protection.
+The application uses an access-token and refresh-token authentication architecture.
 
-The frontend retrieves a CSRF token and sends it through the required request header for protected operations such as authentication refresh and logout.
+### Access Token
 
----
+The short-lived JWT access token is returned to the frontend after authentication and kept in application memory.
 
-# Shopping Cart
-
-The cart supports:
-
-- Guest cart
-- Authenticated cart
-- Product quantities
-- Product removal
-- Cart persistence
-- Server-backed cart operations
-- Cart mutation validation
-
-Automated E2E tests verify real add-to-cart and remove-from-cart flows.
-
----
-
-# Wishlist
-
-Authenticated customers can:
-
-- Save products
-- Load saved products
-- Remove products from their wishlist
-
----
-
-# Orders & Checkout
-
-Checkout supports:
-
-- Shipping addresses
-- Shipping methods
-- Coupon handling
-- Server-calculated order totals
-- Tax handling
-- Order creation
-- Multi-vendor order structure
-
-Customers can view their previous orders from their account.
-
----
-
-# Payments
-
-The project contains Stripe payment integration.
-
-For local development and testing, payment functionality can be used with Stripe test/dummy payment credentials.
-
-No production payment deployment is required for this project.
-
----
-
-# Product Moderation Workflow
-
-A complete automated E2E workflow verifies:
+It is sent using:
 
 ```text
-Vendor creates product
-        ↓
-Product enters pending moderation
-        ↓
-Admin reviews product
-        ↓
-Admin approves product
-        ↓
-Approved product becomes publicly available
+Authorization: Bearer <access-token>

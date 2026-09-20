@@ -40,7 +40,15 @@ export const updateReturn = async (req, res) => {
         return res.status(202).json({ success: true, message: 'Stripe refund is processing', data: result });
       }
     }
-    catch (error) { return reject(res, error.message, 502); }
+    catch (error) {
+  console.error("Return refund processing failed:", error);
+
+  return reject(
+    res,
+    "Unable to process refund",
+    502
+  );
+}
     const group = order.vendorOrders.find((entry) => String(entry.vendor) === String(result.vendor));
     group.status = 'refunded'; group.history.push({ status: 'refunded' }); await order.save();
   }
