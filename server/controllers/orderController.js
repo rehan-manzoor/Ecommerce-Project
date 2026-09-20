@@ -61,33 +61,18 @@ export const createOrder = async (req, res) => {
     if (payment.status !== 'succeeded') { payment.status = 'succeeded'; await payment.save(); }
     const cart = await Cart.findOne({ user: req.user.userId }).populate('items.product');
     if (!cart?.items.length) {
-      await refundPayment(payment, payment.amount / 100, 'Cart empty before order creation');
-      const errorMessage = String(error.message || "");
+  await refundPayment(
+    payment,
+    payment.amount / 100,
+    "Cart empty before order creation"
+  );
 
-if (/stock/i.test(errorMessage)) {
   return fail(
     res,
     409,
-    "Insufficient stock to complete the order"
+    "Cart is empty after payment; a full refund was initiated"
   );
 }
-
-if (/coupon/i.test(errorMessage)) {
-  return fail(
-    res,
-    409,
-    "Coupon is no longer available"
-  );
-}
-
-console.error("Order creation failed:", error);
-
-return fail(
-  res,
-  400,
-  "Unable to create order"
-);
-    }
     const snapshot = payment.cartSnapshot || [];
     const itemsNow = cart.items.map((entry) => {
       const choice = selectedVariant(entry.product, entry.variantId);
@@ -134,7 +119,31 @@ return fail(
       const existing = await Order.findOne({ payment: (await Payment.findOne({ stripePaymentIntentId: req.body.paymentIntentId }))?._id }).populate(populate);
       if (existing) return res.json({ success: true, data: existing });
     }
-    return fail(res, /stock/i.test(error.message) ? 409 : 400, error.message || 'Unable to create order');
+    const errorMessage = String(error.message || "");
+
+if (/stock/i.test(errorMessage)) {
+  return fail(
+    res,
+    409,
+    "Insufficient stock to complete the order"
+  );
+}
+
+if (/coupon/i.test(errorMessage)) {
+  return fail(
+    res,
+    409,
+    "Coupon is no longer available"
+  );
+}
+
+console.error("Order creation failed:", error);
+
+return fail(
+  res,
+  400,
+  "Unable to create order"
+);
   }
 };
 export const getMyOrders = async (req, res) => res.json({ success: true, data: await Order.find({ user: req.user.userId }).populate(populate).sort({ createdAt: -1 }) });
