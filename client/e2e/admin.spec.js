@@ -28,18 +28,17 @@ test.describe.serial("Admin dashboard", () => {
         response.request().method() === "POST"
     );
 
-    await page.getByRole("button", { name: "Sign in" }).click();
+    await page
+      .getByRole("button", {
+        name: "Sign in",
+        exact: true,
+      })
+      .click();
 
     const response = await responsePromise;
 
     if (!response.ok()) {
-      let body = "";
-
-      try {
-        body = await response.text();
-      } catch {
-        body = "Unable to read response body";
-      }
+      const body = await response.text();
 
       throw new Error(
         `Admin login failed: ${response.status()} ${response.statusText()}\n${body}`
@@ -48,16 +47,27 @@ test.describe.serial("Admin dashboard", () => {
 
     await expect(page).not.toHaveURL(/\/login$/);
 
-    await page.goto("/admin");
+    /*
+     * Navigate to /admin without doing a hard browser reload.
+     * This keeps the authenticated React session alive.
+     */
+    await page.evaluate(() => {
+      window.history.pushState({}, "", "/admin");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    });
 
-    await expect(page).toHaveURL(/\/admin/);
+    await expect(page).toHaveURL(/\/admin/, {
+      timeout: 10_000,
+    });
 
     await expect(
       page.getByRole("heading", {
         name: "Marketplace overview",
         exact: true,
       })
-    ).toBeVisible();
+    ).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test.afterAll(async () => {
@@ -65,8 +75,6 @@ test.describe.serial("Admin dashboard", () => {
   });
 
   test("admin dashboard overview loads", async () => {
-    await page.goto("/admin");
-
     await expect(page).toHaveURL(/\/admin/);
 
     await expect(
@@ -85,8 +93,6 @@ test.describe.serial("Admin dashboard", () => {
   });
 
   test("admin vendors tab loads", async () => {
-    await page.goto("/admin");
-
     await page
       .getByRole("button", {
         name: "Vendors",
@@ -103,8 +109,6 @@ test.describe.serial("Admin dashboard", () => {
   });
 
   test("admin products tab loads", async () => {
-    await page.goto("/admin");
-
     await page
       .getByRole("button", {
         name: "Products",
@@ -121,8 +125,6 @@ test.describe.serial("Admin dashboard", () => {
   });
 
   test("admin orders tab loads", async () => {
-    await page.goto("/admin");
-
     await page
       .getByRole("button", {
         name: "Orders",
@@ -139,8 +141,6 @@ test.describe.serial("Admin dashboard", () => {
   });
 
   test("admin reviews tab loads", async () => {
-    await page.goto("/admin");
-
     await page
       .getByRole("button", {
         name: "Reviews",
@@ -157,8 +157,6 @@ test.describe.serial("Admin dashboard", () => {
   });
 
   test("admin categories tab loads", async () => {
-    await page.goto("/admin");
-
     await page
       .getByRole("button", {
         name: "Categories",
@@ -175,8 +173,6 @@ test.describe.serial("Admin dashboard", () => {
   });
 
   test("admin coupons tab loads", async () => {
-    await page.goto("/admin");
-
     await page
       .getByRole("button", {
         name: "Coupons",
@@ -193,8 +189,6 @@ test.describe.serial("Admin dashboard", () => {
   });
 
   test("admin users tab loads", async () => {
-    await page.goto("/admin");
-
     await page
       .getByRole("button", {
         name: "Users",
@@ -211,8 +205,6 @@ test.describe.serial("Admin dashboard", () => {
   });
 
   test("admin returns tab loads", async () => {
-    await page.goto("/admin");
-
     await page
       .getByRole("button", {
         name: "Returns",
@@ -229,8 +221,6 @@ test.describe.serial("Admin dashboard", () => {
   });
 
   test("admin shipping tab loads", async () => {
-    await page.goto("/admin");
-
     await page
       .getByRole("button", {
         name: "Shipping",

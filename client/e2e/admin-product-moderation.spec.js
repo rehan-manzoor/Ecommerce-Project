@@ -84,9 +84,25 @@ test.describe.serial("Admin product moderation mutation flow", () => {
   });
 
   test.afterAll(async () => {
-    await vendorContext?.close();
-    await adminContext?.close();
-  });
+  try {
+    await adminPage?.request.post(
+      "http://localhost:5000/api/users/logout"
+    );
+  } catch {
+    // Ignore cleanup failures.
+  }
+
+  try {
+    await vendorPage?.request.post(
+      "http://localhost:5000/api/users/logout"
+    );
+  } catch {
+    // Ignore cleanup failures.
+  }
+
+  await adminContext?.close();
+  await vendorContext?.close();
+});
 
   test("vendor creates a product pending admin approval", async () => {
     await vendorPage.goto("/vendor");

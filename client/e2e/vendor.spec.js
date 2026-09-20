@@ -33,13 +33,13 @@ test.describe.serial("Vendor dashboard", () => {
     const response = await responsePromise;
 
     if (!response.ok()) {
-      let body = "";
+      let body;
 
-      try {
-        body = await response.text();
-      } catch {
-        body = "Unable to read response body";
-      }
+try {
+  body = await response.text();
+} catch {
+  body = "Unable to read response body";
+}
 
       throw new Error(
         `Vendor login failed: ${response.status()} ${response.statusText()}\n${body}`

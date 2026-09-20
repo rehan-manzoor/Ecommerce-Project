@@ -63,6 +63,19 @@
   background: var(--brand-light);
 }
 
+
+/* Keep CTA buttons accessible inside navbar.
+   .nav-links > a is more specific than .button,
+   so explicitly restore white button text. */
+.nav-links > a.button {
+  color: #ffffff;
+}
+
+.nav-links > a.button:hover {
+  color: #ffffff;
+}
+
+
 .nav-button {
   border: 0;
   background: var(--surface-sunken);
@@ -147,10 +160,12 @@
   text-align: center;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding: 18px;
-  color: #64748b;
+
+  /* Improved contrast against #0b1120 */
+  color: #94a3b8;
+
   font-size: 0.85rem;
 }
-
 /* ==========================================================================
    Hero
    ========================================================================== */
@@ -324,7 +339,7 @@
   background: var(--surface-sunken);
   display: grid;
   place-items: center;
-  color: var(--muted-light);
+  color: var(--muted);
   overflow: hidden;
   font-size: 0.85rem;
 }

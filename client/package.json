@@ -11,7 +11,7 @@
     "test": "vitest run --environment jsdom",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "e2e:report": "playwright show-report"  
+    "e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^6.8.2",
@@ -22,6 +22,7 @@
     "react-router": "^7.18.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
     "@testing-library/jest-dom": "^7.0.1",
