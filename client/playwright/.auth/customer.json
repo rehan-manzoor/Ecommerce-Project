@@ -1,0 +1,25 @@
+{
+  "cookies": [
+    {
+      "name": "refreshToken",
+      "value": "6102ea2bf9cdf5e5b8543eb7fd4bc1c25e7693ab0b922dfb0a5ccae20ef491aa0c3c56a16ab130bfc02a574c16647b0e",
+      "domain": "localhost",
+      "path": "/api/users",
+      "expires": 1790526734.862317,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "csrfToken",
+      "value": "759cd9153927201784683140e533ff574ea629021dfab815b77fcf24b2c9124e",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1790526734.862429,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}

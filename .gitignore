@@ -5,3 +5,6 @@ server/uploads/*
 !server/uploads/.gitkeep
 .DS_Store
 npm-debug.log*
+playwright/.auth/
+test-results/
+playwright-report/
