@@ -3,7 +3,6 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
-import path from "path";
 import userRoutes from "./routes/userRoutes.js";
 import vendorRoutes from "./routes/vendorRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
@@ -24,6 +23,8 @@ import returnRoutes from "./routes/returnRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
+app.set("trust proxy", 1);
+
 app.use(async (req, res, next) => {
   try {
     // Unit/API tests mock database models,
@@ -56,7 +57,6 @@ app.use(cors({ origin: (process.env.CLIENT_URL || "http://localhost:5173").split
 app.post("/api/payments/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
-app.use("/uploads", express.static(path.resolve("uploads")));
 
 app.get("/api/health", (_req, res) => res.json({ success: true, message: "OK", data: null, error: null }));
 app.use("/api/users", userRoutes);
