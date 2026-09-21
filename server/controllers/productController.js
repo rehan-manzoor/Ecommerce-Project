@@ -1,3 +1,6 @@
+import {
+  cleanupRemovedProductImages,
+} from "../services/cloudinaryAssetService.js";
 import mongoose from "mongoose";
 import Product from "../models/Product.js";
 import Vendor from "../models/Vendor.js";
@@ -120,20 +123,142 @@ export const getMyProducts = async (req, res, next) => {
   }
 };
 
-export const updateProduct = async (req, res, next) => {
+export const updateProduct = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const vendor = await vendorForUser(req.user.userId);
-    if (!vendor) return res.status(404).json({ success: false, message: "Vendor profile not found", data: null, error: null });
-    const allowed = ["name", "description", "brand", "price", "stock", "category", "images", "status", "sku", "salePrice", "lowStockThreshold", "tags", "specifications", "variants"];
-    const updates = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowed.includes(key)));
-    if (updates.name) updates.slug = uniqueSlug(updates.name);
-    if (["name", "description", "brand", "price", "category", "images", "variants", "salePrice", "specifications"].some((key) => key in updates)) updates.approvalStatus = "pending";
-    const product = await Product.findOneAndUpdate({ _id: req.params.id, vendor: vendor._id }, updates, { new: true, runValidators: true });
-    if (!product) return res.status(404).json({ success: false, message: "Product not found or not yours", data: null, error: null });
-    res.json({ success: true, message: updates.approvalStatus ? "Product updated and sent for approval" : "Product updated", data: product, error: null });
+    const vendor = await vendorForUser(
+      req.user.userId
+    );
+
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor profile not found",
+        data: null,
+        error: null,
+      });
+    }
+
+    const existingProduct =
+      await Product.findOne({
+        _id: req.params.id,
+        vendor: vendor._id,
+      });
+
+    if (!existingProduct) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Product not found or not yours",
+        data: null,
+        error: null,
+      });
+    }
+
+    const allowed = [
+      "name",
+      "description",
+      "brand",
+      "price",
+      "stock",
+      "category",
+      "images",
+      "status",
+      "sku",
+      "salePrice",
+      "lowStockThreshold",
+      "tags",
+      "specifications",
+      "variants",
+    ];
+
+    const updates =
+      Object.fromEntries(
+        Object.entries(req.body).filter(
+          ([key]) =>
+            allowed.includes(key)
+        )
+      );
+
+    const previousImages = [
+      ...(existingProduct.images || []),
+    ];
+
+    if (updates.name) {
+      updates.slug =
+        uniqueSlug(updates.name);
+    }
+
+    if (
+      [
+        "name",
+        "description",
+        "brand",
+        "price",
+        "category",
+        "images",
+        "variants",
+        "salePrice",
+        "specifications",
+      ].some(
+        (key) => key in updates
+      )
+    ) {
+      updates.approvalStatus =
+        "pending";
+    }
+
+    const product =
+      await Product.findOneAndUpdate(
+        {
+          _id: req.params.id,
+          vendor: vendor._id,
+        },
+        updates,
+        {
+          returnDocument: "after",
+          runValidators: true,
+        }
+      );
+
+    /*
+     * Only clean images when the images array
+     * was actually changed.
+     *
+     * Do this AFTER MongoDB successfully updates.
+     */
+    if (
+      Array.isArray(updates.images)
+    ) {
+      cleanupRemovedProductImages({
+        previousImages,
+        nextImages: product.images || [],
+        productId: product._id,
+      }).catch((error) => {
+        console.error(
+          "Product image cleanup failed:",
+          error
+        );
+      });
+    }
+
+    return res.json({
+      success: true,
+      message:
+        updates.approvalStatus
+          ? "Product updated and sent for approval"
+          : "Product updated",
+      data: product,
+      error: null,
+    });
   } catch (error) {
     error.statusCode = 400;
-    error.publicMessage = "Failed to update product";
+    error.publicMessage =
+      "Failed to update product";
+
     next(error);
   }
 };
