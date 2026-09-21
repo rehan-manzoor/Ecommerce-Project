@@ -28,9 +28,9 @@ export default function ProductDetails() {
       ]);
       const loadedProduct = productRes.data.data;
 
-setProduct(loadedProduct);
-setSelectedImage(loadedProduct?.images?.[0] || "");
-setReviews(reviewsRes.data.data || []);
+      setProduct(loadedProduct);
+      setSelectedImage(loadedProduct?.images?.[0] || "");
+      setReviews(reviewsRes.data.data || []);
 
       if (user?.role === "customer") {
         const ordersRes = await api.get("/orders/my");
@@ -51,9 +51,12 @@ setReviews(reviewsRes.data.data || []);
 
   const eligibleOrder = useMemo(
     () =>
-      orders.find(
-        (order) =>
-          order.vendorOrders?.some((group) => group.status === "delivered" && group.items.some((item) => (item.product?._id || item.product) === id))
+      orders.find((order) =>
+        order.vendorOrders?.some(
+          (group) =>
+            group.status === "delivered" &&
+            group.items.some((item) => (item.product?._id || item.product) === id)
+        )
       ),
     [orders, id]
   );
@@ -66,7 +69,12 @@ setReviews(reviewsRes.data.data || []);
     if (!(selected ? selected.stock : product?.stock)) return;
 
     try {
-      if (user) await api.post("/cart/add", { productId: product._id, variantId: variantId || null, quantity });
+      if (user)
+        await api.post("/cart/add", {
+          productId: product._id,
+          variantId: variantId || null,
+          quantity,
+        });
       else addGuestItem(product, quantity, variantId || null);
       notify("Added to cart");
     } catch (error) {
@@ -95,7 +103,9 @@ setReviews(reviewsRes.data.data || []);
       <div className="state-card page-state">
         <h2>Product not found</h2>
         <p className="muted">It may have been removed or is no longer available.</p>
-        <Link className="button" to="/products">Back to shop</Link>
+        <Link className="button" to="/products">
+          Back to shop
+        </Link>
       </div>
     );
   }
@@ -104,39 +114,32 @@ setReviews(reviewsRes.data.data || []);
 
   return (
     <main className="container page-shell">
-      <Link className="back-link" to="/products">← Back to products</Link>
+      <Link className="back-link" to="/products">
+        ← Back to products
+      </Link>
 
       <div className="product-details-card">
         <div className="product-gallery">
-  <div className="details-image">
-    {selectedImage ? (
-      <img src={selectedImage} alt={product.name} />
-    ) : (
-      <span>No image</span>
-    )}
-  </div>
+          <div className="details-image">
+            {selectedImage ? <img src={selectedImage} alt={product.name} /> : <span>No image</span>}
+          </div>
 
-  {product.images?.length > 1 && (
-    <div className="product-thumbnails">
-      {product.images.map((image, index) => (
-        <button
-          key={`${image}-${index}`}
-          type="button"
-          className={`product-thumbnail ${
-            selectedImage === image ? "active" : ""
-          }`}
-          onClick={() => setSelectedImage(image)}
-          aria-label={`View ${product.name} image ${index + 1}`}
-        >
-          <img
-            src={image}
-            alt={`${product.name} thumbnail ${index + 1}`}
-          />
-        </button>
-      ))}
-    </div>
-  )}
-</div>
+          {product.images?.length > 1 && (
+            <div className="product-thumbnails">
+              {product.images.map((image, index) => (
+                <button
+                  key={`${image}-${index}`}
+                  type="button"
+                  className={`product-thumbnail ${selectedImage === image ? "active" : ""}`}
+                  onClick={() => setSelectedImage(image)}
+                  aria-label={`View ${product.name} image ${index + 1}`}
+                >
+                  <img src={image} alt={`${product.name} thumbnail ${index + 1}`} />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         <div className="details-info">
           <span className="eyebrow">{product.category?.name || "Product"}</span>
@@ -150,14 +153,45 @@ setReviews(reviewsRes.data.data || []);
           <p className="details-description">{product.description}</p>
 
           {product.brand && (
-            <p><strong>Brand:</strong> {product.brand}</p>
+            <p>
+              <strong>Brand:</strong> {product.brand}
+            </p>
           )}
 
-          <p className="details-price">${(product.variants?.find((entry) => entry._id === variantId)?.price ?? product.salePrice ?? product.price).toFixed(2)}</p>
-          {product.variants?.length > 0 && <label>Variant<select required value={variantId} onChange={(event) => { setVariantId(event.target.value); setQuantity(1); }}><option value="">Select variant</option>{product.variants.map((variant) => <option key={variant._id} value={variant._id}>{Object.values(variant.attributes || {}).join(" / ")} · ${variant.price.toFixed(2)} · {variant.stock} left</option>)}</select></label>}
+          <p className="details-price">
+            $
+            {(
+              product.variants?.find((entry) => entry._id === variantId)?.price ??
+              product.salePrice ??
+              product.price
+            ).toFixed(2)}
+          </p>
+          {product.variants?.length > 0 && (
+            <label>
+              Variant
+              <select
+                required
+                value={variantId}
+                onChange={(event) => {
+                  setVariantId(event.target.value);
+                  setQuantity(1);
+                }}
+              >
+                <option value="">Select variant</option>
+                {product.variants.map((variant) => (
+                  <option key={variant._id} value={variant._id}>
+                    {Object.values(variant.attributes || {}).join(" / ")} · $
+                    {variant.price.toFixed(2)} · {variant.stock} left
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
 
           <p className={product.stock ? "stock-ok" : "stock-out"}>
-            {(product.variants?.find((entry) => entry._id === variantId)?.stock ?? product.stock) ? `${product.variants?.find((entry) => entry._id === variantId)?.stock ?? product.stock} in stock` : "Out of stock"}
+            {(product.variants?.find((entry) => entry._id === variantId)?.stock ?? product.stock)
+              ? `${product.variants?.find((entry) => entry._id === variantId)?.stock ?? product.stock} in stock`
+              : "Out of stock"}
           </p>
 
           {product.vendor && (
@@ -172,15 +206,59 @@ setReviews(reviewsRes.data.data || []);
           {canBuy && (
             <>
               <div className="quantity-row">
-                <button aria-label="Decrease quantity" onClick={() => setQuantity((q) => Math.max(1, q - 1))}>−</button>
+                <button
+                  aria-label="Decrease quantity"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                >
+                  −
+                </button>
                 <span>{quantity}</span>
-                <button aria-label="Increase quantity" onClick={() => setQuantity((q) => Math.min(product.variants?.find((entry) => entry._id === variantId)?.stock ?? product.stock, q + 1))}>+</button>
+                <button
+                  aria-label="Increase quantity"
+                  onClick={() =>
+                    setQuantity((q) =>
+                      Math.min(
+                        product.variants?.find((entry) => entry._id === variantId)?.stock ??
+                          product.stock,
+                        q + 1
+                      )
+                    )
+                  }
+                >
+                  +
+                </button>
               </div>
 
-              <button className="button full" disabled={product.variants?.length ? !variantId || !product.variants.find((entry) => entry._id === variantId)?.stock : !product.stock} onClick={addToCart}>
-                {(product.variants?.find((entry) => entry._id === variantId)?.stock ?? product.stock) ? "Add to cart" : "Out of stock"}
+              <button
+                className="button full"
+                disabled={
+                  product.variants?.length
+                    ? !variantId ||
+                      !product.variants.find((entry) => entry._id === variantId)?.stock
+                    : !product.stock
+                }
+                onClick={addToCart}
+              >
+                {(product.variants?.find((entry) => entry._id === variantId)?.stock ??
+                product.stock)
+                  ? "Add to cart"
+                  : "Out of stock"}
               </button>
-              {user && <button className="button ghost full" onClick={async () => { try { await api.put(`/wishlist/${id}`); notify("Saved to wishlist"); } catch { notify("Could not save item", "error"); } }}>Save to wishlist</button>}
+              {user && (
+                <button
+                  className="button ghost full"
+                  onClick={async () => {
+                    try {
+                      await api.put(`/wishlist/${id}`);
+                      notify("Saved to wishlist");
+                    } catch {
+                      notify("Could not save item", "error");
+                    }
+                  }}
+                >
+                  Save to wishlist
+                </button>
+              )}
             </>
           )}
         </div>
@@ -201,7 +279,10 @@ setReviews(reviewsRes.data.data || []);
                 <strong>{review.user?.name || "Customer"}</strong>
                 <span className="verified-badge">Verified purchase</span>
               </div>
-              <div className="stars">{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</div>
+              <div className="stars">
+                {"★".repeat(review.rating)}
+                {"☆".repeat(5 - review.rating)}
+              </div>
               <p>{review.comment}</p>
               <small className="muted">{new Date(review.createdAt).toLocaleDateString()}</small>
             </article>
@@ -217,7 +298,9 @@ setReviews(reviewsRes.data.data || []);
               Rating
               <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
                 {[5, 4, 3, 2, 1].map((n) => (
-                  <option key={n} value={n}>{"★".repeat(n)} {n}/5</option>
+                  <option key={n} value={n}>
+                    {"★".repeat(n)} {n}/5
+                  </option>
                 ))}
               </select>
             </label>
@@ -238,7 +321,9 @@ setReviews(reviewsRes.data.data || []);
         )}
 
         {user?.role === "customer" && !eligibleOrder && (
-          <p className="muted">Review form appears after this product is delivered in one of your orders.</p>
+          <p className="muted">
+            Review form appears after this product is delivered in one of your orders.
+          </p>
         )}
       </section>
     </main>

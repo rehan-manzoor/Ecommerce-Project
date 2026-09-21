@@ -26,7 +26,12 @@ export default function Navbar() {
   };
 
   const homeLink = user?.role === "admin" ? "/admin" : user?.role === "vendor" ? "/vendor" : "/";
-  const brandLabel = user?.role === "admin" ? "MERN Admin" : user?.role === "vendor" ? "Seller Center" : "MERN Market";
+  const brandLabel =
+    user?.role === "admin"
+      ? "MERN Admin"
+      : user?.role === "vendor"
+        ? "Seller Center"
+        : "MERN Market";
 
   const goToCategory = (e) => {
     if (e.target.value) navigate(`/products?category=${e.target.value}`);
@@ -42,34 +47,64 @@ export default function Navbar() {
           <span>{brandLabel}</span>
         </Link>
 
-        <button className="menu-toggle" onClick={() => setOpen((v) => !v)} aria-label="Toggle navigation" aria-expanded={open}>
+        <button
+          className="menu-toggle"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Toggle navigation"
+          aria-expanded={open}
+        >
           ☰
         </button>
 
         <div className={`nav-links ${open ? "open" : ""}`}>
           {(!user || user.role === "customer") && (
             <>
-              <NavLink to="/" onClick={close}>Home</NavLink>
-              <NavLink to="/products" onClick={close}>Shop</NavLink>
+              <NavLink to="/" onClick={close}>
+                Home
+              </NavLink>
+              <NavLink to="/products" onClick={close}>
+                Shop
+              </NavLink>
 
               {categories.length > 0 && (
-                <select className="nav-category-select" defaultValue="" onChange={goToCategory} aria-label="Browse by category">
-                  <option value="" disabled>Categories</option>
+                <select
+                  className="nav-category-select"
+                  defaultValue=""
+                  onChange={goToCategory}
+                  aria-label="Browse by category"
+                >
+                  <option value="" disabled>
+                    Categories
+                  </option>
                   {categories.map((category) => (
-                    <option key={category._id} value={category._id}>{category.name}</option>
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
                   ))}
                 </select>
               )}
 
-              <NavLink to="/cart" onClick={close}>Cart</NavLink>
+              <NavLink to="/cart" onClick={close}>
+                Cart
+              </NavLink>
 
               {user && (
                 <>
-                  <NavLink to="/orders" onClick={close}>My Orders</NavLink>
-                  <NavLink to="/wishlist" onClick={close}>Wishlist</NavLink>
-                  <NavLink to="/returns" onClick={close}>Returns</NavLink>
-                  <NavLink to="/become-vendor" onClick={close}>Become Seller</NavLink>
-                  <NavLink to="/profile" onClick={close}>My Account</NavLink>
+                  <NavLink to="/orders" onClick={close}>
+                    My Orders
+                  </NavLink>
+                  <NavLink to="/wishlist" onClick={close}>
+                    Wishlist
+                  </NavLink>
+                  <NavLink to="/returns" onClick={close}>
+                    Returns
+                  </NavLink>
+                  <NavLink to="/become-vendor" onClick={close}>
+                    Become Seller
+                  </NavLink>
+                  <NavLink to="/profile" onClick={close}>
+                    My Account
+                  </NavLink>
                 </>
               )}
             </>
@@ -77,27 +112,49 @@ export default function Navbar() {
 
           {user?.role === "vendor" && (
             <>
-              <NavLink to="/vendor" onClick={close}>Dashboard</NavLink>
-              <NavLink to="/products" onClick={close}>View Marketplace</NavLink>
-              <NavLink to="/profile" onClick={close}>My Account</NavLink>
+              <NavLink to="/vendor" onClick={close}>
+                Dashboard
+              </NavLink>
+              <NavLink to="/products" onClick={close}>
+                View Marketplace
+              </NavLink>
+              <NavLink to="/profile" onClick={close}>
+                My Account
+              </NavLink>
             </>
           )}
 
           {user?.role === "admin" && (
             <>
-              <NavLink to="/admin" onClick={close}>Control Center</NavLink>
-              <NavLink to="/products" onClick={close}>View Marketplace</NavLink>
-              <NavLink to="/profile" onClick={close}>Admin Account</NavLink>
+              <NavLink to="/admin" onClick={close}>
+                Control Center
+              </NavLink>
+              <NavLink to="/products" onClick={close}>
+                View Marketplace
+              </NavLink>
+              <NavLink to="/profile" onClick={close}>
+                Admin Account
+              </NavLink>
             </>
           )}
 
-          {user && <NavLink to="/notifications" onClick={close}>Notifications</NavLink>}
+          {user && (
+            <NavLink to="/notifications" onClick={close}>
+              Notifications
+            </NavLink>
+          )}
           {user ? (
-            <button className="nav-button" onClick={signOut}>Logout</button>
+            <button className="nav-button" onClick={signOut}>
+              Logout
+            </button>
           ) : (
             <>
-              <NavLink to="/login" onClick={close}>Login</NavLink>
-              <Link className="button small" to="/register" onClick={close}>Create account</Link>
+              <NavLink to="/login" onClick={close}>
+                Login
+              </NavLink>
+              <Link className="button small" to="/register" onClick={close}>
+                Create account
+              </Link>
             </>
           )}
         </div>

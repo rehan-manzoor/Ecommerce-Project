@@ -1,5 +1,11 @@
 import express from "express";
-import { createCoupon, getCoupons, updateCoupon, deleteCoupon, validateCouponEndpoint } from "../controllers/couponController.js";
+import {
+  createCoupon,
+  getCoupons,
+  updateCoupon,
+  deleteCoupon,
+  validateCouponEndpoint,
+} from "../controllers/couponController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
 const router = express.Router();

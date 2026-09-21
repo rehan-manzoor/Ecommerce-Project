@@ -12,9 +12,7 @@ const connectDB = async () => {
   }
 
   const mongoUri =
-    process.env.MONGO_URI ||
-    process.env.MONGODB_URI ||
-    "mongodb://127.0.0.1:27017/mern_ecommerce";
+    process.env.MONGO_URI || process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/mern_ecommerce";
 
   connectionPromise = mongoose
     .connect(mongoUri, {
@@ -27,10 +25,7 @@ const connectDB = async () => {
     .catch((error) => {
       connectionPromise = null;
 
-      console.error(
-        "MongoDB connection failed:",
-        error.message
-      );
+      console.error("MongoDB connection failed:", error.message);
 
       throw error;
     });

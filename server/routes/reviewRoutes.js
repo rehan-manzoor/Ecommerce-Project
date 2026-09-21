@@ -1,5 +1,12 @@
 import express from "express";
-import { createReview, getProductReviews, getAllReviews, approveReview, rejectReview, deleteReview } from "../controllers/reviewController.js";
+import {
+  createReview,
+  getProductReviews,
+  getAllReviews,
+  approveReview,
+  rejectReview,
+  deleteReview,
+} from "../controllers/reviewController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
 const router = express.Router();

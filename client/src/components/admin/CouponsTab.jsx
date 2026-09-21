@@ -1,4 +1,3 @@
-
 export function CouponsTab({
   coupons,
   form,
@@ -14,15 +13,10 @@ export function CouponsTab({
     <>
       <div className="page-title">
         <h1>Coupons</h1>
-        <p>
-          Create and manage marketplace-wide discount codes.
-        </p>
+        <p>Create and manage marketplace-wide discount codes.</p>
       </div>
 
-      <form
-        className="panel inline-admin-form coupon-form"
-        onSubmit={onSave}
-      >
+      <form className="panel inline-admin-form coupon-form" onSubmit={onSave}>
         <input
           required
           placeholder="CODE"
@@ -44,13 +38,9 @@ export function CouponsTab({
             })
           }
         >
-          <option value="percentage">
-            Percentage
-          </option>
+          <option value="percentage">Percentage</option>
 
-          <option value="fixed">
-            Fixed
-          </option>
+          <option value="fixed">Fixed</option>
         </select>
 
         <input
@@ -99,27 +89,15 @@ export function CouponsTab({
             })
           }
         >
-          <option value="active">
-            Active
-          </option>
+          <option value="active">Active</option>
 
-          <option value="inactive">
-            Inactive
-          </option>
+          <option value="inactive">Inactive</option>
         </select>
 
-        <button className="button">
-          {editingCouponId
-            ? "Save changes"
-            : "Create coupon"}
-        </button>
+        <button className="button">{editingCouponId ? "Save changes" : "Create coupon"}</button>
 
         {editingCouponId && (
-          <button
-            type="button"
-            className="button ghost"
-            onClick={onCancelEdit}
-          >
+          <button type="button" className="button ghost" onClick={onCancelEdit}>
             Cancel
           </button>
         )}
@@ -150,44 +128,23 @@ export function CouponsTab({
 
                 <td>
                   {coupon.discountValue}
-                  {coupon.discountType === "percentage"
-                    ? "%"
-                    : " USD"}
+                  {coupon.discountType === "percentage" ? "%" : " USD"}
                 </td>
 
-                <td>
-                  ${coupon.minPurchaseAmount || 0}
-                </td>
+                <td>${coupon.minPurchaseAmount || 0}</td>
+
+                <td>{new Date(coupon.expiresAt).toLocaleDateString()}</td>
+
+                <td>{coupon.active ? "Active" : "Inactive"}</td>
 
                 <td>
-                  {new Date(
-                    coupon.expiresAt
-                  ).toLocaleDateString()}
-                </td>
-
-                <td>
-                  {coupon.active ? "Active" : "Inactive"}
-                </td>
-
-                <td>
-                  <button
-                    className="text-button"
-                    onClick={() => onEdit(coupon)}
-                  >
+                  <button className="text-button" onClick={() => onEdit(coupon)}>
                     Edit
                   </button>{" "}
-
-                  <button
-                    className="text-button"
-                    onClick={() => onToggleActive(coupon)}
-                  >
+                  <button className="text-button" onClick={() => onToggleActive(coupon)}>
                     {coupon.active ? "Disable" : "Enable"}
                   </button>{" "}
-
-                  <button
-                    className="text-button danger"
-                    onClick={() => onDelete(coupon)}
-                  >
+                  <button className="text-button danger" onClick={() => onDelete(coupon)}>
                     Delete
                   </button>
                 </td>

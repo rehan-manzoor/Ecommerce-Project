@@ -60,7 +60,9 @@ export default function Payment() {
       <div className="state-card page-state">
         <h2>Checkout information is missing</h2>
         <p className="muted">Please start again from your cart.</p>
-        <button className="button" onClick={() => navigate("/cart")}>Back to cart</button>
+        <button className="button" onClick={() => navigate("/cart")}>
+          Back to cart
+        </button>
       </div>
     );
   }
@@ -69,13 +71,16 @@ export default function Payment() {
     try {
       setLoading(true);
       const response = await api.post("/payments/create-intent", {
-  couponCode,
-  shippingMethodId,
-  shippingAddress
-});
+        couponCode,
+        shippingMethodId,
+        shippingAddress,
+      });
       setClientSecret(response.data.data.clientSecret);
       setPricing(response.data.data.pricing);
-      sessionStorage.setItem("checkoutPayload", JSON.stringify({ shippingAddress, couponCode, shippingMethodId }));
+      sessionStorage.setItem(
+        "checkoutPayload",
+        JSON.stringify({ shippingAddress, couponCode, shippingMethodId })
+      );
     } catch (error) {
       notify(error.response?.data?.message || "Could not prepare payment", "error");
     } finally {
@@ -111,8 +116,13 @@ export default function Payment() {
         <aside className="summary-card panel">
           <h2>Deliver to</h2>
           <p>{shippingAddress.address}</p>
-          <p>{shippingAddress.city}{shippingAddress.state ? `, ${shippingAddress.state}` : ""}</p>
-          <p>{shippingAddress.postalCode}, {shippingAddress.country}</p>
+          <p>
+            {shippingAddress.city}
+            {shippingAddress.state ? `, ${shippingAddress.state}` : ""}
+          </p>
+          <p>
+            {shippingAddress.postalCode}, {shippingAddress.country}
+          </p>
 
           {pricing && (
             <>
@@ -127,8 +137,14 @@ export default function Payment() {
                   <strong>−${pricing.discountAmount.toFixed(2)}</strong>
                 </div>
               )}
-              <div className="summary-row"><span>Shipping</span><strong>${pricing.shippingAmount.toFixed(2)}</strong></div>
-              <div className="summary-row"><span>Tax</span><strong>${pricing.taxAmount.toFixed(2)}</strong></div>
+              <div className="summary-row">
+                <span>Shipping</span>
+                <strong>${pricing.shippingAmount.toFixed(2)}</strong>
+              </div>
+              <div className="summary-row">
+                <span>Tax</span>
+                <strong>${pricing.taxAmount.toFixed(2)}</strong>
+              </div>
               <div className="summary-total">
                 <span>Total</span>
                 <strong>${pricing.totalAmount.toFixed(2)}</strong>

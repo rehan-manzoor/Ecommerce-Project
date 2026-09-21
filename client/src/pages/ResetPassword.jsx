@@ -65,7 +65,10 @@ export default function ResetPassword() {
           {loading ? "Resetting..." : "Reset password"}
         </button>
         <p>
-          Remembered it after all? <Link className="text-link" to="/login">Back to sign in</Link>
+          Remembered it after all?{" "}
+          <Link className="text-link" to="/login">
+            Back to sign in
+          </Link>
         </p>
       </form>
     </main>

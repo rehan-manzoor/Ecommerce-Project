@@ -1,10 +1,6 @@
 import { USER_ROLES } from "./shared.js";
 
-export function UsersTab({
-  users,
-  onRoleChange,
-  onToggleBlock,
-}) {
+export function UsersTab({ users, onRoleChange, onToggleBlock }) {
   return (
     <>
       <div className="page-title">
@@ -33,36 +29,21 @@ export function UsersTab({
                 <td>
                   <select
                     value={user.role}
-                    onChange={(event) =>
-                      onRoleChange(
-                        user,
-                        event.target.value
-                      )
-                    }
+                    onChange={(event) => onRoleChange(user, event.target.value)}
                   >
                     {USER_ROLES.map((role) => (
-                      <option
-                        key={role}
-                        value={role}
-                      >
+                      <option key={role} value={role}>
                         {role}
                       </option>
                     ))}
                   </select>
                 </td>
 
-                <td>
-                  {user.isBlocked ? "Blocked" : "Active"}
-                </td>
+                <td>{user.isBlocked ? "Blocked" : "Active"}</td>
 
                 <td>
-                  <button
-                    className="text-button"
-                    onClick={() => onToggleBlock(user)}
-                  >
-                    {user.isBlocked
-                      ? "Unblock"
-                      : "Block"}
+                  <button className="text-button" onClick={() => onToggleBlock(user)}>
+                    {user.isBlocked ? "Unblock" : "Block"}
                   </button>
                 </td>
               </tr>

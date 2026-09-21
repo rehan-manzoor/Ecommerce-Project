@@ -14,8 +14,42 @@ const startForRange = (range) => {
 
 export const getOverview = async (req, res, next) => {
   try {
-    const [revenueAgg, totalOrders, totalCustomers, totalVendors, totalProducts, pendingProducts, pendingVendors, returns, refunds] = await Promise.all([
-      Payment.aggregate([{ $match: { status: { $in: ["succeeded", "refunded"] }, order: { $ne: null } } }, { $unwind: { path: "$refunds", preserveNullAndEmptyArrays: true } }, { $group: { _id: "$_id", amount: { $first: "$amount" }, refunded: { $sum: { $cond: [{ $ne: ["$refunds.status", "failed"] }, { $ifNull: ["$refunds.amount", 0] }, 0] } } } }, { $group: { _id: null, total: { $sum: { $divide: [{ $subtract: ["$amount", "$refunded"] }, 100] } } } }]),
+    const [
+      revenueAgg,
+      totalOrders,
+      totalCustomers,
+      totalVendors,
+      totalProducts,
+      pendingProducts,
+      pendingVendors,
+      returns,
+      refunds,
+    ] = await Promise.all([
+      Payment.aggregate([
+        { $match: { status: { $in: ["succeeded", "refunded"] }, order: { $ne: null } } },
+        { $unwind: { path: "$refunds", preserveNullAndEmptyArrays: true } },
+        {
+          $group: {
+            _id: "$_id",
+            amount: { $first: "$amount" },
+            refunded: {
+              $sum: {
+                $cond: [
+                  { $ne: ["$refunds.status", "failed"] },
+                  { $ifNull: ["$refunds.amount", 0] },
+                  0,
+                ],
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: { $divide: [{ $subtract: ["$amount", "$refunded"] }, 100] } },
+          },
+        },
+      ]),
       Order.countDocuments(),
       User.countDocuments({ role: "customer" }),
       Vendor.countDocuments({ status: "approved" }),
@@ -36,7 +70,8 @@ export const getOverview = async (req, res, next) => {
         totalProducts,
         pendingProducts,
         pendingVendors,
-        returns, refunds,
+        returns,
+        refunds,
       },
       error: null,
     });
@@ -51,8 +86,16 @@ export const getSalesOverTime = async (req, res, next) => {
     const start = startForRange(range);
     const dateFormat = range === "12m" ? "%Y-%m" : "%Y-%m-%d";
     const data = await Order.aggregate([
-      { $match: { createdAt: { $gte: start }, paymentStatus: "paid", status: { $ne: "cancelled" } } },
-      { $group: { _id: { $dateToString: { format: dateFormat, date: "$createdAt" } }, revenue: { $sum: "$totalAmount" }, orders: { $sum: 1 } } },
+      {
+        $match: { createdAt: { $gte: start }, paymentStatus: "paid", status: { $ne: "cancelled" } },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: dateFormat, date: "$createdAt" } },
+          revenue: { $sum: "$totalAmount" },
+          orders: { $sum: 1 },
+        },
+      },
       { $sort: { _id: 1 } },
       { $project: { _id: 0, label: "$_id", revenue: 1, orders: 1 } },
     ]);
@@ -67,7 +110,14 @@ export const getTopProducts = async (req, res) => {
     const data = await Order.aggregate([
       { $match: { paymentStatus: "paid", status: { $ne: "cancelled" } } },
       { $unwind: "$items" },
-      { $group: { _id: "$items.product", name: { $first: "$items.name" }, units: { $sum: "$items.quantity" }, revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } } } },
+      {
+        $group: {
+          _id: "$items.product",
+          name: { $first: "$items.name" },
+          units: { $sum: "$items.quantity" },
+          revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } },
+        },
+      },
       { $sort: { revenue: -1 } },
       { $limit: 5 },
     ]);
@@ -82,7 +132,13 @@ export const getTopVendors = async (req, res, next) => {
     const data = await Order.aggregate([
       { $match: { paymentStatus: "paid", status: { $ne: "cancelled" } } },
       { $unwind: "$items" },
-      { $group: { _id: "$items.vendor", revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } }, units: { $sum: "$items.quantity" } } },
+      {
+        $group: {
+          _id: "$items.vendor",
+          revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } },
+          units: { $sum: "$items.quantity" },
+        },
+      },
       { $sort: { revenue: -1 } },
       { $limit: 5 },
       { $lookup: { from: "vendors", localField: "_id", foreignField: "_id", as: "vendor" } },

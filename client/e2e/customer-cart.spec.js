@@ -9,9 +9,7 @@ test.describe.serial("Customer cart mutation flow", () => {
     const password = process.env.E2E_CUSTOMER_PASSWORD;
 
     if (!email || !password) {
-      throw new Error(
-        "Set E2E_CUSTOMER_EMAIL and E2E_CUSTOMER_PASSWORD before running this test."
-      );
+      throw new Error("Set E2E_CUSTOMER_EMAIL and E2E_CUSTOMER_PASSWORD before running this test.");
     }
 
     context = await browser.newContext();
@@ -24,8 +22,7 @@ test.describe.serial("Customer cart mutation flow", () => {
 
     const loginResponsePromise = page.waitForResponse(
       (response) =>
-        response.url().includes("/api/users/login") &&
-        response.request().method() === "POST"
+        response.url().includes("/api/users/login") && response.request().method() === "POST"
     );
 
     await page
@@ -85,8 +82,7 @@ test.describe.serial("Customer cart mutation flow", () => {
       const deleteResponsePromise = page
         .waitForResponse(
           (response) =>
-            response.url().includes("/api/cart") &&
-            response.request().method() !== "GET",
+            response.url().includes("/api/cart") && response.request().method() !== "GET",
           {
             timeout: 10_000,
           }
@@ -124,8 +120,7 @@ test.describe.serial("Customer cart mutation flow", () => {
     const productsResponsePromise = page
       .waitForResponse(
         (response) =>
-          response.url().includes("/api/products") &&
-          response.request().method() === "GET",
+          response.url().includes("/api/products") && response.request().method() === "GET",
         {
           timeout: 10_000,
         }
@@ -136,31 +131,22 @@ test.describe.serial("Customer cart mutation flow", () => {
 
     await productsResponsePromise;
 
-    const productLinks = page.locator(
-      'a[href^="/products/"]'
-    );
+    const productLinks = page.locator('a[href^="/products/"]');
 
     await expect
-      .poll(
-        async () => await productLinks.count(),
-        {
-          timeout: 10_000,
-        }
-      )
+      .poll(async () => await productLinks.count(), {
+        timeout: 10_000,
+      })
       .toBeGreaterThan(0);
 
     const productCount = await productLinks.count();
 
-    console.log(
-      `Products found on page: ${productCount}`
-    );
+    console.log(`Products found on page: ${productCount}`);
 
     let productAdded = false;
 
     for (let i = 0; i < productCount; i++) {
-      const href = await productLinks
-        .nth(i)
-        .getAttribute("href");
+      const href = await productLinks.nth(i).getAttribute("href");
 
       if (!href) {
         continue;
@@ -178,15 +164,9 @@ test.describe.serial("Customer cart mutation flow", () => {
         })
         .catch(() => false);
 
-      const enabled = visible
-        ? await addButton
-            .isEnabled()
-            .catch(() => false)
-        : false;
+      const enabled = visible ? await addButton.isEnabled().catch(() => false) : false;
 
-      console.log(
-        `Checking ${href} - Add to cart visible: ${visible}, enabled: ${enabled}`
-      );
+      console.log(`Checking ${href} - Add to cart visible: ${visible}, enabled: ${enabled}`);
 
       if (!visible || !enabled) {
         continue;
@@ -195,19 +175,12 @@ test.describe.serial("Customer cart mutation flow", () => {
       /*
        * Handle product variants if present.
        */
-      const variantSelect =
-        page.getByLabel(/variant/i);
+      const variantSelect = page.getByLabel(/variant/i);
 
-      if (
-        await variantSelect
-          .isVisible()
-          .catch(() => false)
-      ) {
-        const options =
-          variantSelect.locator("option");
+      if (await variantSelect.isVisible().catch(() => false)) {
+        const options = variantSelect.locator("option");
 
-        const optionCount =
-          await options.count();
+        const optionCount = await options.count();
 
         if (optionCount > 1) {
           await variantSelect.selectOption({
@@ -219,24 +192,19 @@ test.describe.serial("Customer cart mutation flow", () => {
       /*
        * Wait for cart mutation.
        */
-      const cartResponsePromise =
-        page.waitForResponse(
-          (response) =>
-            response.url().includes("/api/cart") &&
-            response.request().method() !== "GET",
-          {
-            timeout: 10_000,
-          }
-        );
+      const cartResponsePromise = page.waitForResponse(
+        (response) => response.url().includes("/api/cart") && response.request().method() !== "GET",
+        {
+          timeout: 10_000,
+        }
+      );
 
       await addButton.click();
 
-      const cartResponse =
-        await cartResponsePromise;
+      const cartResponse = await cartResponsePromise;
 
       if (!cartResponse.ok()) {
-        const body =
-          await cartResponse.text();
+        const body = await cartResponse.text();
 
         throw new Error(
           `Add to cart failed: ${cartResponse.status()} ${cartResponse.statusText()}\n${body}`
@@ -271,30 +239,21 @@ test.describe.serial("Customer cart mutation flow", () => {
     });
 
     await expect
-      .poll(
-        async () =>
-          await removeButtons.count(),
-        {
-          timeout: 10_000,
-        }
-      )
+      .poll(async () => await removeButtons.count(), {
+        timeout: 10_000,
+      })
       .toBeGreaterThan(0);
 
-    const countBeforeRemoval =
-      await removeButtons.count();
+    const countBeforeRemoval = await removeButtons.count();
 
-    console.log(
-      `Cart items before removal: ${countBeforeRemoval}`
-    );
+    console.log(`Cart items before removal: ${countBeforeRemoval}`);
 
     /*
      * Remove item.
      */
     const removeResponsePromise = page
       .waitForResponse(
-        (response) =>
-          response.url().includes("/api/cart") &&
-          response.request().method() !== "GET",
+        (response) => response.url().includes("/api/cart") && response.request().method() !== "GET",
         {
           timeout: 10_000,
         }

@@ -13,7 +13,10 @@ export default function Products() {
   const query = useMemo(() => searchParams.toString(), [searchParams]);
 
   useEffect(() => {
-    api.get("/categories").then((r) => setCategories(r.data.data || [])).catch(() => {});
+    api
+      .get("/categories")
+      .then((r) => setCategories(r.data.data || []))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -59,25 +62,78 @@ export default function Products() {
 
           <label>
             Category
-            <select value={searchParams.get("category") || ""} onChange={(e) => update("category", e.target.value)}>
+            <select
+              value={searchParams.get("category") || ""}
+              onChange={(e) => update("category", e.target.value)}
+            >
               <option value="">All categories</option>
               {categories.map((category) => (
-                <option key={category._id} value={category._id}>{category.name}</option>
+                <option key={category._id} value={category._id}>
+                  {category.name}
+                </option>
               ))}
             </select>
           </label>
 
           <div className="split">
-            <label>Min price<input type="number" min="0" value={searchParams.get("minPrice") || ""} onChange={(e) => update("minPrice", e.target.value)} /></label>
-            <label>Max price<input type="number" min="0" value={searchParams.get("maxPrice") || ""} onChange={(e) => update("maxPrice", e.target.value)} /></label>
+            <label>
+              Min price
+              <input
+                type="number"
+                min="0"
+                value={searchParams.get("minPrice") || ""}
+                onChange={(e) => update("minPrice", e.target.value)}
+              />
+            </label>
+            <label>
+              Max price
+              <input
+                type="number"
+                min="0"
+                value={searchParams.get("maxPrice") || ""}
+                onChange={(e) => update("maxPrice", e.target.value)}
+              />
+            </label>
           </div>
-          <label>Brand<input value={searchParams.get("brand") || ""} onChange={(e) => update("brand", e.target.value)} placeholder="Brand" /></label>
-          <label>Minimum rating<select value={searchParams.get("minRating") || ""} onChange={(e) => update("minRating", e.target.value)}><option value="">Any rating</option>{[4,3,2,1].map((value) => <option key={value} value={value}>{value}+ stars</option>)}</select></label>
-          <label>Availability<select value={searchParams.get("availability") || ""} onChange={(e) => update("availability", e.target.value)}><option value="">All</option><option value="in_stock">In stock</option></select></label>
+          <label>
+            Brand
+            <input
+              value={searchParams.get("brand") || ""}
+              onChange={(e) => update("brand", e.target.value)}
+              placeholder="Brand"
+            />
+          </label>
+          <label>
+            Minimum rating
+            <select
+              value={searchParams.get("minRating") || ""}
+              onChange={(e) => update("minRating", e.target.value)}
+            >
+              <option value="">Any rating</option>
+              {[4, 3, 2, 1].map((value) => (
+                <option key={value} value={value}>
+                  {value}+ stars
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Availability
+            <select
+              value={searchParams.get("availability") || ""}
+              onChange={(e) => update("availability", e.target.value)}
+            >
+              <option value="">All</option>
+              <option value="in_stock">In stock</option>
+            </select>
+          </label>
 
           <label>
             Sort
-            <select value={searchParams.get("sort") || "newest"} onChange={(e) => update("sort", e.target.value)}>
+            <select
+              value={searchParams.get("sort") || "newest"}
+              onChange={(e) => update("sort", e.target.value)}
+            >
               <option value="newest">Newest</option>
               <option value="price_asc">Price: low to high</option>
               <option value="price_desc">Price: high to low</option>
@@ -85,12 +141,18 @@ export default function Products() {
             </select>
           </label>
 
-          <button className="button ghost full" onClick={clearFilters}>Clear filters</button>
+          <button className="button ghost full" onClick={clearFilters}>
+            Clear filters
+          </button>
         </aside>
 
         <section>
           <form className="search-bar" onSubmit={submitSearch}>
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search products or brands..." />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search products or brands..."
+            />
             <button className="button">Search</button>
           </form>
 
@@ -111,9 +173,21 @@ export default function Products() {
 
           {pagination.totalPages > 1 && (
             <div className="pagination">
-              <button disabled={pagination.page <= 1} onClick={() => update("page", String(pagination.page - 1))}>Previous</button>
-              <span>Page {pagination.page} of {pagination.totalPages}</span>
-              <button disabled={pagination.page >= pagination.totalPages} onClick={() => update("page", String(pagination.page + 1))}>Next</button>
+              <button
+                disabled={pagination.page <= 1}
+                onClick={() => update("page", String(pagination.page - 1))}
+              >
+                Previous
+              </button>
+              <span>
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+              <button
+                disabled={pagination.page >= pagination.totalPages}
+                onClick={() => update("page", String(pagination.page + 1))}
+              >
+                Next
+              </button>
             </div>
           )}
         </section>
@@ -126,7 +200,11 @@ function ProductCard({ product }) {
   return (
     <Link className="product-card" to={`/products/${product._id}`}>
       <div className="product-image">
-        {product.images?.[0] ? <img src={product.images[0]} alt={product.name} /> : <span>No image</span>}
+        {product.images?.[0] ? (
+          <img src={product.images[0]} alt={product.name} />
+        ) : (
+          <span>No image</span>
+        )}
       </div>
       <div className="product-info">
         <span className="muted small-text">{product.category?.name}</span>

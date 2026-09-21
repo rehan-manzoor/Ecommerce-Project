@@ -17,82 +17,72 @@ export default function Orders() {
   }, []);
 
   const cancel = async (order, group) => {
-  const result = await openDialog({
-    title: "Cancel seller items",
-    description: `Tell us why you want to cancel items from ${
-      group.vendor?.storeName || "this seller"
-    }.`,
-    fields: [
-      {
-        name: "reason",
-        label: "Cancellation reason",
-        type: "textarea",
-        required: true,
-      },
-    ],
-    confirmLabel: "Cancel items",
-    danger: true,
-  });
-
-  const reason = result?.reason?.trim();
-
-  if (!reason) return;
-
-  try {
-    await api.post(
-      `/orders/${order._id}/vendors/${
-        group.vendor?._id || group.vendor
-      }/cancel`,
-      { reason }
-    );
-
-    const response = await api.get("/orders/my");
-    setOrders(response.data.data || []);
-
-    notify("Cancellation and refund initiated");
-  } catch (error) {
-    notify(
-      error.response?.data?.message || "Cancellation failed",
-      "error"
-    );
-  }
-};
-  const requestReturn = async (order, item) => {
-  const result = await openDialog({
-    title: `Return ${item.name}`,
-    description:
-      "Please tell us why you would like to return this product.",
-    fields: [
-      {
-        name: "reason",
-        label: "Return reason",
-        type: "textarea",
-        required: true,
-      },
-    ],
-    confirmLabel: "Request return",
-  });
-
-  const reason = result?.reason?.trim();
-
-  if (!reason) return;
-
-  try {
-    await api.post("/returns", {
-      orderId: order._id,
-      productId: item.product?._id || item.product,
-      quantity: item.quantity,
-      reason,
+    const result = await openDialog({
+      title: "Cancel seller items",
+      description: `Tell us why you want to cancel items from ${
+        group.vendor?.storeName || "this seller"
+      }.`,
+      fields: [
+        {
+          name: "reason",
+          label: "Cancellation reason",
+          type: "textarea",
+          required: true,
+        },
+      ],
+      confirmLabel: "Cancel items",
+      danger: true,
     });
 
-    notify("Return requested");
-  } catch (error) {
-    notify(
-      error.response?.data?.message || "Return request failed",
-      "error"
-    );
-  }
-};
+    const reason = result?.reason?.trim();
+
+    if (!reason) return;
+
+    try {
+      await api.post(`/orders/${order._id}/vendors/${group.vendor?._id || group.vendor}/cancel`, {
+        reason,
+      });
+
+      const response = await api.get("/orders/my");
+      setOrders(response.data.data || []);
+
+      notify("Cancellation and refund initiated");
+    } catch (error) {
+      notify(error.response?.data?.message || "Cancellation failed", "error");
+    }
+  };
+  const requestReturn = async (order, item) => {
+    const result = await openDialog({
+      title: `Return ${item.name}`,
+      description: "Please tell us why you would like to return this product.",
+      fields: [
+        {
+          name: "reason",
+          label: "Return reason",
+          type: "textarea",
+          required: true,
+        },
+      ],
+      confirmLabel: "Request return",
+    });
+
+    const reason = result?.reason?.trim();
+
+    if (!reason) return;
+
+    try {
+      await api.post("/returns", {
+        orderId: order._id,
+        productId: item.product?._id || item.product,
+        quantity: item.quantity,
+        reason,
+      });
+
+      notify("Return requested");
+    } catch (error) {
+      notify(error.response?.data?.message || "Return request failed", "error");
+    }
+  };
   if (loading) return <OrdersSkeleton />;
 
   return (
@@ -132,7 +122,10 @@ export default function Orders() {
                   <div className="order-product" key={`${order._id}-${index}`}>
                     <div className="mini-thumb">
                       {(item.image || item.product?.images?.[0]) && (
-                        <img src={item.image || item.product.images[0]} alt={item.name || item.product?.name} />
+                        <img
+                          src={item.image || item.product.images[0]}
+                          alt={item.name || item.product?.name}
+                        />
                       )}
                     </div>
                     <div>
@@ -147,9 +140,46 @@ export default function Orders() {
                 ))}
               </div>
 
-              <div className="summary-row"><span>Shipping</span><strong>${Number(order.shippingAmount || 0).toFixed(2)}</strong></div>
-              <div className="summary-row"><span>Tax</span><strong>${Number(order.taxAmount || 0).toFixed(2)}</strong></div>
-              {order.vendorOrders?.map((group) => <div className="panel" key={group._id}><h4>{group.vendor?.storeName || "Seller"} · {group.status}</h4>{group.history?.map((event, index) => <p className="muted small-text" key={index}>{event.status} · {new Date(event.changedAt).toLocaleString()}</p>)}{group.trackingNumber && <p>Tracking: {group.carrier} · {group.trackingNumber}</p>}{["pending","confirmed"].includes(group.status) && <button className="button danger small" onClick={() => cancel(order, group)}>Cancel seller items</button>}{group.status === "delivered" && group.items.map((item, index) => <button className="button ghost small" key={index} onClick={() => requestReturn(order, item)}>Return {item.name}</button>)}</div>)}
+              <div className="summary-row">
+                <span>Shipping</span>
+                <strong>${Number(order.shippingAmount || 0).toFixed(2)}</strong>
+              </div>
+              <div className="summary-row">
+                <span>Tax</span>
+                <strong>${Number(order.taxAmount || 0).toFixed(2)}</strong>
+              </div>
+              {order.vendorOrders?.map((group) => (
+                <div className="panel" key={group._id}>
+                  <h4>
+                    {group.vendor?.storeName || "Seller"} · {group.status}
+                  </h4>
+                  {group.history?.map((event, index) => (
+                    <p className="muted small-text" key={index}>
+                      {event.status} · {new Date(event.changedAt).toLocaleString()}
+                    </p>
+                  ))}
+                  {group.trackingNumber && (
+                    <p>
+                      Tracking: {group.carrier} · {group.trackingNumber}
+                    </p>
+                  )}
+                  {["pending", "confirmed"].includes(group.status) && (
+                    <button className="button danger small" onClick={() => cancel(order, group)}>
+                      Cancel seller items
+                    </button>
+                  )}
+                  {group.status === "delivered" &&
+                    group.items.map((item, index) => (
+                      <button
+                        className="button ghost small"
+                        key={index}
+                        onClick={() => requestReturn(order, item)}
+                      >
+                        Return {item.name}
+                      </button>
+                    ))}
+                </div>
+              ))}
               {order.discountAmount > 0 && (
                 <p className="discount">
                   Coupon {order.couponCode}: −${order.discountAmount.toFixed(2)}

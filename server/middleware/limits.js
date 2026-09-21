@@ -15,9 +15,7 @@ export const authLimiter = rateLimit({
   limit: 12,
 
   // E2E bypass is allowed only outside production.
-  skip: () =>
-    process.env.NODE_ENV !== "production" &&
-    process.env.E2E_TEST === "true",
+  skip: () => process.env.NODE_ENV !== "production" && process.env.E2E_TEST === "true",
 });
 
 export const paymentLimiter = rateLimit({

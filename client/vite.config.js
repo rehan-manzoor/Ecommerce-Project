@@ -7,16 +7,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
 
-    include: [
-      "src/**/*.{test,spec}.{js,jsx}",
-    ],
+    include: ["src/**/*.{test,spec}.{js,jsx}"],
 
-    exclude: [
-      "e2e/**",
-      "node_modules/**",
-      "dist/**",
-      "playwright-report/**",
-      "test-results/**",
-    ],
+    exclude: ["e2e/**", "node_modules/**", "dist/**", "playwright-report/**", "test-results/**"],
   },
 });

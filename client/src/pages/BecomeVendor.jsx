@@ -44,7 +44,9 @@ export default function BecomeVendor() {
       <main className="container page-shell">
         <div className="state-card">
           <h2>You are an approved vendor</h2>
-          <Link className="button" to="/vendor">Open vendor dashboard</Link>
+          <Link className="button" to="/vendor">
+            Open vendor dashboard
+          </Link>
         </div>
       </main>
     );
@@ -58,7 +60,10 @@ export default function BecomeVendor() {
           <h1>{vendor.storeName}</h1>
           <p>{vendor.description}</p>
           {vendor.status === "pending" && (
-            <p className="muted">Your application is waiting for admin review. After approval, log out and sign in again to refresh your vendor role.</p>
+            <p className="muted">
+              Your application is waiting for admin review. After approval, log out and sign in
+              again to refresh your vendor role.
+            </p>
           )}
           {vendor.status === "rejected" && (
             <p className="danger-text">Reason: {vendor.rejectionReason || "No reason provided"}</p>
@@ -73,14 +78,33 @@ export default function BecomeVendor() {
       <div className="seller-hero panel">
         <span className="eyebrow">Sell on MERN Market</span>
         <h1>Open your store</h1>
-        <p>Submit your seller profile. An administrator will review it before you can publish products.</p>
+        <p>
+          Submit your seller profile. An administrator will review it before you can publish
+          products.
+        </p>
       </div>
 
       {notFound && (
         <form className="panel seller-form" onSubmit={submit}>
-          <label>Store name<input required value={form.storeName} onChange={(e) => setForm({ ...form, storeName: e.target.value })} /></label>
-          <label>Description<textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>
-          <button className="button" disabled={submitting}>{submitting ? "Submitting..." : "Submit application"}</button>
+          <label>
+            Store name
+            <input
+              required
+              value={form.storeName}
+              onChange={(e) => setForm({ ...form, storeName: e.target.value })}
+            />
+          </label>
+          <label>
+            Description
+            <textarea
+              required
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
+          </label>
+          <button className="button" disabled={submitting}>
+            {submitting ? "Submitting..." : "Submit application"}
+          </button>
         </form>
       )}
     </main>

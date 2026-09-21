@@ -1,18 +1,5 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 
@@ -61,11 +48,7 @@ vi.mock("@stripe/stripe-js", () => ({
 vi.mock("@stripe/react-stripe-js", () => ({
   Elements: ({ children }) => <div data-testid="stripe-elements">{children}</div>,
 
-  PaymentElement: () => (
-    <div data-testid="payment-element">
-      Stripe Payment Element
-    </div>
-  ),
+  PaymentElement: () => <div data-testid="payment-element">Stripe Payment Element</div>,
 
   useStripe: () => mocks.stripe,
 
@@ -194,13 +177,17 @@ describe("Payment", () => {
     );
 
     await waitFor(() => {
-      expect(mocks.apiPost).toHaveBeenCalledWith(
-        "/payments/create-intent",
-        {
-          couponCode: "SAVE20",
-          shippingMethodId: "shipping-1",
-        }
-      );
+      expect(mocks.apiPost).toHaveBeenCalledWith("/payments/create-intent", {
+        couponCode: "SAVE20",
+        shippingMethodId: "shipping-1",
+        shippingAddress: {
+          address: "123 Main Road",
+          city: "Lahore",
+          state: "Punjab",
+          postalCode: "54000",
+          country: "Pakistan",
+        },
+      });
     });
   });
 
@@ -214,14 +201,10 @@ describe("Payment", () => {
     );
 
     await waitFor(() => {
-      expect(
-        sessionStorage.getItem("checkoutPayload")
-      ).not.toBeNull();
+      expect(sessionStorage.getItem("checkoutPayload")).not.toBeNull();
     });
 
-    const stored = JSON.parse(
-      sessionStorage.getItem("checkoutPayload")
-    );
+    const stored = JSON.parse(sessionStorage.getItem("checkoutPayload"));
 
     expect(stored).toEqual({
       shippingAddress,
@@ -239,9 +222,7 @@ describe("Payment", () => {
       })
     );
 
-    expect(
-      await screen.findByTestId("payment-element")
-    ).toBeInTheDocument();
+    expect(await screen.findByTestId("payment-element")).toBeInTheDocument();
 
     expect(
       screen.getByRole("button", {
@@ -268,10 +249,7 @@ describe("Payment", () => {
     );
 
     await waitFor(() => {
-      expect(mocks.notify).toHaveBeenCalledWith(
-        "Payment service unavailable",
-        "error"
-      );
+      expect(mocks.notify).toHaveBeenCalledWith("Payment service unavailable", "error");
     });
   });
 
@@ -322,10 +300,7 @@ describe("Payment", () => {
     fireEvent.click(payButton);
 
     await waitFor(() => {
-      expect(mocks.notify).toHaveBeenCalledWith(
-        "Your card was declined",
-        "error"
-      );
+      expect(mocks.notify).toHaveBeenCalledWith("Your card was declined", "error");
     });
   });
 });

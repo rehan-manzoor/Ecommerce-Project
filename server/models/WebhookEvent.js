@@ -26,7 +26,4 @@ const webhookEventSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model(
-  "WebhookEvent",
-  webhookEventSchema
-);
+export default mongoose.model("WebhookEvent", webhookEventSchema);

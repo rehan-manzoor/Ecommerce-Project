@@ -1,4 +1,3 @@
-
 export function DashboardSkeleton() {
   return (
     <>
@@ -15,23 +14,14 @@ export function DashboardSkeleton() {
         {Array.from({
           length: 6,
         }).map((_, index) => (
-          <div
-            className="stat-card"
-            key={index}
-          >
-            <div
-              className="skeleton"
-              style={{ height: 60 }}
-            />
+          <div className="stat-card" key={index}>
+            <div className="skeleton" style={{ height: 60 }} />
           </div>
         ))}
       </div>
 
       <div className="panel">
-        <div
-          className="skeleton"
-          style={{ height: 220 }}
-        />
+        <div className="skeleton" style={{ height: 220 }} />
       </div>
     </>
   );

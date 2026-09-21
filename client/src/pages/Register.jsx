@@ -28,12 +28,43 @@ export default function Register() {
         <span className="eyebrow">Join the marketplace</span>
         <h1>Create account</h1>
 
-        <label>Name<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
-        <label>Email<input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></label>
-        <label>Password<input type="password" minLength="6" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></label>
+        <label>
+          Name
+          <input
+            required
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
+        </label>
+        <label>
+          Email
+          <input
+            type="email"
+            required
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+          />
+        </label>
+        <label>
+          Password
+          <input
+            type="password"
+            minLength="6"
+            required
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+          />
+        </label>
 
-        <button className="button full" disabled={loading}>{loading ? "Creating..." : "Create account"}</button>
-        <p>Already have an account? <Link className="text-link" to="/login">Sign in</Link></p>
+        <button className="button full" disabled={loading}>
+          {loading ? "Creating..." : "Create account"}
+        </button>
+        <p>
+          Already have an account?{" "}
+          <Link className="text-link" to="/login">
+            Sign in
+          </Link>
+        </p>
       </form>
     </main>
   );

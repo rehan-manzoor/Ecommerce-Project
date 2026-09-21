@@ -3,7 +3,15 @@ import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import { notify } from "../components/Toast";
 
-const EMPTY_ADDRESS = { label: "Home", address: "", city: "", state: "", postalCode: "", country: "Pakistan", isDefault: false };
+const EMPTY_ADDRESS = {
+  label: "Home",
+  address: "",
+  city: "",
+  state: "",
+  postalCode: "",
+  country: "Pakistan",
+  isDefault: false,
+};
 
 export default function Profile() {
   const { refreshUser } = useAuth();
@@ -71,11 +79,29 @@ export default function Profile() {
       <div className="profile-grid">
         <form className="panel" onSubmit={saveProfile}>
           <h2>Personal information</h2>
-          <label>Name<input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
-          <label>Avatar URL<input value={form.avatar} onChange={(e) => setForm({ ...form, avatar: e.target.value })} placeholder="Optional image URL" /></label>
-          <label>Email<input value={profile.email} disabled /></label>
-          <label>Role<input value={profile.role} disabled /></label>
-          <button className="button" disabled={savingProfile}>{savingProfile ? "Saving..." : "Save changes"}</button>
+          <label>
+            Name
+            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          </label>
+          <label>
+            Avatar URL
+            <input
+              value={form.avatar}
+              onChange={(e) => setForm({ ...form, avatar: e.target.value })}
+              placeholder="Optional image URL"
+            />
+          </label>
+          <label>
+            Email
+            <input value={profile.email} disabled />
+          </label>
+          <label>
+            Role
+            <input value={profile.role} disabled />
+          </label>
+          <button className="button" disabled={savingProfile}>
+            {savingProfile ? "Saving..." : "Save changes"}
+          </button>
         </form>
 
         <section className="panel">
@@ -86,27 +112,80 @@ export default function Profile() {
           {profile.addresses?.map((item) => (
             <div className="address-card" key={item._id}>
               <div>
-                <strong>{item.label} {item.isDefault && <span className="verified-badge">Default</span>}</strong>
-                <p>{item.address}, {item.city}, {item.state} {item.postalCode}, {item.country}</p>
+                <strong>
+                  {item.label} {item.isDefault && <span className="verified-badge">Default</span>}
+                </strong>
+                <p>
+                  {item.address}, {item.city}, {item.state} {item.postalCode}, {item.country}
+                </p>
               </div>
-              <button className="text-button danger" onClick={() => removeAddress(item._id)}>Remove</button>
+              <button className="text-button danger" onClick={() => removeAddress(item._id)}>
+                Remove
+              </button>
             </div>
           ))}
 
           <form className="address-form" onSubmit={addAddress}>
             <h3>Add address</h3>
             <div className="form-grid">
-              <label>Label<input value={address.label} onChange={(e) => setAddress({ ...address, label: e.target.value })} /></label>
-              <label className="wide">Street address<input required value={address.address} onChange={(e) => setAddress({ ...address, address: e.target.value })} /></label>
-              <label>City<input required value={address.city} onChange={(e) => setAddress({ ...address, city: e.target.value })} /></label>
-              <label>State<input value={address.state} onChange={(e) => setAddress({ ...address, state: e.target.value })} /></label>
-              <label>Postal code<input required value={address.postalCode} onChange={(e) => setAddress({ ...address, postalCode: e.target.value })} /></label>
-              <label>Country<input required value={address.country} onChange={(e) => setAddress({ ...address, country: e.target.value })} /></label>
+              <label>
+                Label
+                <input
+                  value={address.label}
+                  onChange={(e) => setAddress({ ...address, label: e.target.value })}
+                />
+              </label>
+              <label className="wide">
+                Street address
+                <input
+                  required
+                  value={address.address}
+                  onChange={(e) => setAddress({ ...address, address: e.target.value })}
+                />
+              </label>
+              <label>
+                City
+                <input
+                  required
+                  value={address.city}
+                  onChange={(e) => setAddress({ ...address, city: e.target.value })}
+                />
+              </label>
+              <label>
+                State
+                <input
+                  value={address.state}
+                  onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                />
+              </label>
+              <label>
+                Postal code
+                <input
+                  required
+                  value={address.postalCode}
+                  onChange={(e) => setAddress({ ...address, postalCode: e.target.value })}
+                />
+              </label>
+              <label>
+                Country
+                <input
+                  required
+                  value={address.country}
+                  onChange={(e) => setAddress({ ...address, country: e.target.value })}
+                />
+              </label>
             </div>
             <label className="checkbox">
-              <input type="checkbox" checked={address.isDefault} onChange={(e) => setAddress({ ...address, isDefault: e.target.checked })} /> Make default
+              <input
+                type="checkbox"
+                checked={address.isDefault}
+                onChange={(e) => setAddress({ ...address, isDefault: e.target.checked })}
+              />{" "}
+              Make default
             </label>
-            <button className="button" disabled={savingAddress}>{savingAddress ? "Saving..." : "Add address"}</button>
+            <button className="button" disabled={savingAddress}>
+              {savingAddress ? "Saving..." : "Add address"}
+            </button>
           </form>
         </section>
       </div>
@@ -119,8 +198,12 @@ function ProfileSkeleton() {
     <main className="container page-shell">
       <div className="skeleton" style={{ height: 32, width: 200, marginBottom: 30 }} />
       <div className="profile-grid">
-        <div className="panel"><div className="skeleton" style={{ height: 220 }} /></div>
-        <div className="panel"><div className="skeleton" style={{ height: 220 }} /></div>
+        <div className="panel">
+          <div className="skeleton" style={{ height: 220 }} />
+        </div>
+        <div className="panel">
+          <div className="skeleton" style={{ height: 220 }} />
+        </div>
       </div>
     </main>
   );

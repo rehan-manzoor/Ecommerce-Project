@@ -29,20 +29,14 @@ app.use(async (req, res, next) => {
   try {
     // Unit/API tests mock database models,
     // so they should not open a real MongoDB connection.
-    if (
-      process.env.NODE_ENV === "test" ||
-      req.path === "/api/health"
-    ) {
+    if (process.env.NODE_ENV === "test" || req.path === "/api/health") {
       return next();
     }
 
     await connectDB();
     next();
   } catch (error) {
-    console.error(
-      "Database connection failed:",
-      error.message
-    );
+    console.error("Database connection failed:", error.message);
 
     return res.status(503).json({
       success: false,
@@ -53,12 +47,19 @@ app.use(async (req, res, next) => {
   }
 });
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
-app.use(cors({ origin: (process.env.CLIENT_URL || "http://localhost:5173").split(",").map((url) => url.trim()), credentials: true }));
+app.use(
+  cors({
+    origin: (process.env.CLIENT_URL || "http://localhost:5173").split(",").map((url) => url.trim()),
+    credentials: true,
+  })
+);
 app.post("/api/payments/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
-app.get("/api/health", (_req, res) => res.json({ success: true, message: "OK", data: null, error: null }));
+app.get("/api/health", (_req, res) =>
+  res.json({ success: true, message: "OK", data: null, error: null })
+);
 app.use("/api/users", userRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/categories", categoryRoutes);

@@ -17,7 +17,9 @@ export default function Login() {
     try {
       const user = await login(email, password);
       notify(`Welcome back, ${user.name}`);
-      const destination = location.state?.from || (user.role === "admin" ? "/admin" : user.role === "vendor" ? "/vendor" : "/");
+      const destination =
+        location.state?.from ||
+        (user.role === "admin" ? "/admin" : user.role === "vendor" ? "/vendor" : "/");
       navigate(destination, { replace: true });
     } catch (error) {
       notify(error.response?.data?.message || "Login failed", "error");
@@ -35,16 +37,37 @@ export default function Login() {
 
         <label>
           Email
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+          />
         </label>
         <label>
           Password
-          <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+          />
         </label>
 
-        <button className="button full" disabled={loading}>{loading ? "Signing in..." : "Sign in"}</button>
-        <Link className="text-link" to="/forgot-password">Forgot password?</Link>
-        <p>New here? <Link className="text-link" to="/register">Create an account</Link></p>
+        <button className="button full" disabled={loading}>
+          {loading ? "Signing in..." : "Sign in"}
+        </button>
+        <Link className="text-link" to="/forgot-password">
+          Forgot password?
+        </Link>
+        <p>
+          New here?{" "}
+          <Link className="text-link" to="/register">
+            Create an account
+          </Link>
+        </p>
       </form>
     </main>
   );

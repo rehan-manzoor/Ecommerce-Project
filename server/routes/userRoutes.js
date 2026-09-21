@@ -1,8 +1,18 @@
 import express from "express";
 import {
-  createUser, loginUser, getMe, updateMe, addAddress, deleteAddress,
-  forgotPassword, resetPassword, getUsers, updateUserRole, toggleUserBlock,
-  refreshLogin, logoutUser,
+  createUser,
+  loginUser,
+  getMe,
+  updateMe,
+  addAddress,
+  deleteAddress,
+  forgotPassword,
+  resetPassword,
+  getUsers,
+  updateUserRole,
+  toggleUserBlock,
+  refreshLogin,
+  logoutUser,
 } from "../controllers/userController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";

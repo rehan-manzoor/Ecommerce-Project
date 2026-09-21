@@ -6,9 +6,7 @@ export function VendorSkeleton() {
     <main className="dashboard-shell">
       <aside className="dashboard-sidebar">
         <div>
-          <span className="eyebrow">
-            Vendor
-          </span>
+          <span className="eyebrow">Vendor</span>
 
           <div
             className="skeleton"

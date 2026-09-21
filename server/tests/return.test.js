@@ -8,17 +8,13 @@ process.env.JWT_ACCESS_SECRET = "local-test-secret";
 process.env.CLIENT_URL = "http://localhost:5173";
 process.env.NODE_ENV = "test";
 
-const [
-  { default: app },
-  { default: User },
-  { default: Order },
-  { default: ReturnRequest },
-] = await Promise.all([
-  import("../app.js"),
-  import("../models/User.js"),
-  import("../models/Order.js"),
-  import("../models/ReturnRequest.js"),
-]);
+const [{ default: app }, { default: User }, { default: Order }, { default: ReturnRequest }] =
+  await Promise.all([
+    import("../app.js"),
+    import("../models/User.js"),
+    import("../models/Order.js"),
+    import("../models/ReturnRequest.js"),
+  ]);
 
 const customerId = "68aa00000000000000000001";
 const orderId = "68aa00000000000000000010";
@@ -91,10 +87,7 @@ beforeEach(() => {
   createdReturn = null;
 
   Order.findOne = async (filter) => {
-    if (
-      String(filter._id) === orderId &&
-      String(filter.user) === customerId
-    ) {
+    if (String(filter._id) === orderId && String(filter.user) === customerId) {
       return fakeOrder;
     }
 
@@ -128,14 +121,12 @@ after(() => {
 });
 
 test("return route rejects unauthenticated requests", async () => {
-  const response = await request(app)
-    .post("/api/returns")
-    .send({
-      orderId,
-      productId,
-      quantity: 1,
-      reason: "Damaged item",
-    });
+  const response = await request(app).post("/api/returns").send({
+    orderId,
+    productId,
+    quantity: 1,
+    reason: "Damaged item",
+  });
 
   assert.equal(response.status, 401);
   assert.equal(response.body.success, false);
@@ -157,44 +148,23 @@ test("customer can request a return for a delivered product", async () => {
 
   assert.ok(createdReturn);
 
-  assert.equal(
-    String(createdReturn.user),
-    customerId
-  );
+  assert.equal(String(createdReturn.user), customerId);
 
-  assert.equal(
-    String(createdReturn.order),
-    orderId
-  );
+  assert.equal(String(createdReturn.order), orderId);
 
-  assert.equal(
-    String(createdReturn.vendor),
-    vendorId
-  );
+  assert.equal(String(createdReturn.vendor), vendorId);
 
-  assert.equal(
-    String(createdReturn.product),
-    productId
-  );
+  assert.equal(String(createdReturn.product), productId);
 
   assert.equal(createdReturn.quantity, 1);
 
-  assert.equal(
-    createdReturn.reason,
-    "Item arrived damaged"
-  );
+  assert.equal(createdReturn.reason, "Item arrived damaged");
 
   assert.equal(createdReturn.refundAmount, 100);
 
-  assert.equal(
-    fakeOrder.vendorOrders[0].status,
-    "return_requested"
-  );
+  assert.equal(fakeOrder.vendorOrders[0].status, "return_requested");
 
-  assert.equal(
-    fakeOrder.vendorOrders[0].history.at(-1).status,
-    "return_requested"
-  );
+  assert.equal(fakeOrder.vendorOrders[0].history.at(-1).status, "return_requested");
 });
 
 test("return request calculates refund using requested quantity", async () => {
@@ -229,10 +199,7 @@ test("return request rejects quantity greater than purchased quantity", async ()
   assert.equal(response.status, 400);
   assert.equal(response.body.success, false);
 
-  assert.equal(
-    response.body.message,
-    "Quantity and reason are required"
-  );
+  assert.equal(response.body.message, "Quantity and reason are required");
 
   assert.equal(createdReturn, null);
 });
@@ -251,10 +218,7 @@ test("return request rejects a missing or too-short reason", async () => {
   assert.equal(response.status, 400);
   assert.equal(response.body.success, false);
 
-  assert.equal(
-    response.body.message,
-    "Quantity and reason are required"
-  );
+  assert.equal(response.body.message, "Quantity and reason are required");
 
   assert.equal(createdReturn, null);
 });
@@ -275,18 +239,13 @@ test("return request rejects products that are not delivered", async () => {
   assert.equal(response.status, 400);
   assert.equal(response.body.success, false);
 
-  assert.equal(
-    response.body.message,
-    "Return window closed or item not delivered"
-  );
+  assert.equal(response.body.message, "Return window closed or item not delivered");
 
   assert.equal(createdReturn, null);
 });
 
 test("return request rejects products outside the 14 day return window", async () => {
-  fakeOrder.vendorOrders[0].deliveredAt = new Date(
-    Date.now() - 15 * 24 * 60 * 60 * 1000
-  );
+  fakeOrder.vendorOrders[0].deliveredAt = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
 
   const response = await request(app)
     .post("/api/returns")
@@ -301,10 +260,7 @@ test("return request rejects products outside the 14 day return window", async (
   assert.equal(response.status, 400);
   assert.equal(response.body.success, false);
 
-  assert.equal(
-    response.body.message,
-    "Return window closed or item not delivered"
-  );
+  assert.equal(response.body.message, "Return window closed or item not delivered");
 
   assert.equal(createdReturn, null);
 });

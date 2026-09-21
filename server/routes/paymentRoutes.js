@@ -14,24 +14,10 @@ import { paymentLimiter } from "../middleware/limits.js";
 
 const router = express.Router();
 
-router.post(
-  "/create-intent",
-  protect,
-  paymentLimiter,
-  validate(intentSchema),
-  createPaymentIntent
-);
+router.post("/create-intent", protect, paymentLimiter, validate(intentSchema), createPaymentIntent);
 
-router.get(
-  "/intent/:paymentIntentId",
-  protect,
-  getPaymentByIntent
-);
+router.get("/intent/:paymentIntentId", protect, getPaymentByIntent);
 
-router.get(
-  "/:id",
-  protect,
-  getPayment
-);
+router.get("/:id", protect, getPayment);
 
 export default router;

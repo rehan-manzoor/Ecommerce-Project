@@ -6,10 +6,7 @@ const PRODUCT_FOLDER = "mern-marketplace/products";
 
 export const getCloudinaryPublicId = (url) => {
   try {
-    if (
-      typeof url !== "string" ||
-      !url.includes("res.cloudinary.com")
-    ) {
+    if (typeof url !== "string" || !url.includes("res.cloudinary.com")) {
       return null;
     }
 
@@ -22,9 +19,7 @@ export const getCloudinaryPublicId = (url) => {
       return null;
     }
 
-    let path = parsed.pathname.slice(
-      uploadIndex + uploadMarker.length
-    );
+    let path = parsed.pathname.slice(uploadIndex + uploadMarker.length);
 
     // Remove Cloudinary transformation/version part like:
     // v123456789/
@@ -43,10 +38,7 @@ export const getCloudinaryPublicId = (url) => {
   }
 };
 
-export const deleteUnusedProductImage = async (
-  imageUrl,
-  currentProductId = null
-) => {
+export const deleteUnusedProductImage = async (imageUrl, currentProductId = null) => {
   try {
     const publicId = getCloudinaryPublicId(imageUrl);
 
@@ -64,39 +56,29 @@ export const deleteUnusedProductImage = async (
       };
     }
 
-    const [usedByAnotherProduct, usedByOrder] =
-      await Promise.all([
-        Product.exists(productFilter),
+    const [usedByAnotherProduct, usedByOrder] = await Promise.all([
+      Product.exists(productFilter),
 
-        Order.exists({
-          "items.image": imageUrl,
-        }),
-      ]);
+      Order.exists({
+        "items.image": imageUrl,
+      }),
+    ]);
 
-    if (
-      usedByAnotherProduct ||
-      usedByOrder
-    ) {
+    if (usedByAnotherProduct || usedByOrder) {
       return false;
     }
 
-    const result =
-      await cloudinary.uploader.destroy(publicId, {
-        resource_type: "image",
-      });
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: "image",
+    });
 
-    return ["ok", "not found"].includes(
-      result.result
-    );
+    return ["ok", "not found"].includes(result.result);
   } catch (error) {
     /*
      * Image cleanup should never make a successful
      * product update fail.
      */
-    console.error(
-      "Cloudinary image cleanup failed:",
-      error.message
-    );
+    console.error("Cloudinary image cleanup failed:", error.message);
 
     return false;
   }
@@ -109,21 +91,11 @@ export const cleanupRemovedProductImages = async ({
 }) => {
   const nextSet = new Set(nextImages);
 
-  const removedImages =
-    previousImages.filter(
-      (url) => !nextSet.has(url)
-    );
+  const removedImages = previousImages.filter((url) => !nextSet.has(url));
 
   if (!removedImages.length) {
     return;
   }
 
-  await Promise.allSettled(
-    removedImages.map((url) =>
-      deleteUnusedProductImage(
-        url,
-        productId
-      )
-    )
-  );
+  await Promise.allSettled(removedImages.map((url) => deleteUnusedProductImage(url, productId)));
 };

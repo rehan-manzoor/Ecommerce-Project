@@ -8,6 +8,11 @@
     "dev:client": "npm run dev --prefix client",
     "build:client": "npm run build --prefix client",
     "migrate:legacy": "npm run migrate:legacy --prefix server",
-    "create-admin": "npm run create-admin --prefix server --"
+    "create-admin": "npm run create-admin --prefix server --",
+    "format": "prettier --write \"client/**/*.{js,jsx,json,css}\" \"server/**/*.js\" \"*.{json,md}\"",
+    "format:check": "prettier --check \"client/**/*.{js,jsx,json,css}\" \"server/**/*.js\" \"*.{json,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
   }
 }

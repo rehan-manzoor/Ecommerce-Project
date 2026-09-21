@@ -214,8 +214,11 @@ ul {
   padding: 12px 20px;
   font-weight: 700;
   font-size: 0.95rem;
-  transition: background var(--fast) var(--ease), transform var(--fast) var(--ease),
-    box-shadow var(--fast) var(--ease), opacity var(--fast) var(--ease);
+  transition:
+    background var(--fast) var(--ease),
+    transform var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease),
+    opacity var(--fast) var(--ease);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -336,7 +339,9 @@ select {
   padding: 11px 13px;
   color: var(--ink);
   outline: none;
-  transition: border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+  transition:
+    border-color var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease);
 }
 input::placeholder,
 textarea::placeholder {

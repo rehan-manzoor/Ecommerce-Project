@@ -13,10 +13,7 @@ export function OverviewTab({ data }) {
     ["Refunded payments", data.overview?.refunds],
   ];
 
-  const maxRevenue = Math.max(
-    1,
-    ...data.sales.map((item) => item.revenue || 0)
-  );
+  const maxRevenue = Math.max(1, ...data.sales.map((item) => item.revenue || 0));
 
   return (
     <>
@@ -49,10 +46,7 @@ export function OverviewTab({ data }) {
                   <div
                     className="bar"
                     style={{
-                      height: `${Math.max(
-                        4,
-                        (item.revenue / maxRevenue) * 180
-                      )}px`,
+                      height: `${Math.max(4, (item.revenue / maxRevenue) * 180)}px`,
                     }}
                   />
                   <small>{item.label.slice(5)}</small>

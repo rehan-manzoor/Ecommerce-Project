@@ -9,9 +9,7 @@ test.describe.serial("Admin dashboard", () => {
     const password = process.env.E2E_ADMIN_PASSWORD;
 
     if (!email || !password) {
-      throw new Error(
-        "Set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD before running admin E2E tests."
-      );
+      throw new Error("Set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD before running admin E2E tests.");
     }
 
     context = await browser.newContext();
@@ -24,8 +22,7 @@ test.describe.serial("Admin dashboard", () => {
 
     const responsePromise = page.waitForResponse(
       (response) =>
-        response.url().includes("/api/users/login") &&
-        response.request().method() === "POST"
+        response.url().includes("/api/users/login") && response.request().method() === "POST"
     );
 
     await page
@@ -40,9 +37,7 @@ test.describe.serial("Admin dashboard", () => {
     if (!response.ok()) {
       const body = await response.text();
 
-      throw new Error(
-        `Admin login failed: ${response.status()} ${response.statusText()}\n${body}`
-      );
+      throw new Error(`Admin login failed: ${response.status()} ${response.statusText()}\n${body}`);
     }
 
     await expect(page).not.toHaveURL(/\/login$/);

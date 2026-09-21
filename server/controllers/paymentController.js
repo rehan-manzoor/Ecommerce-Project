@@ -19,11 +19,7 @@ export const createPaymentIntent = async (req, res, next) => {
       totalAmount,
       coupon,
       shippingMethod,
-    } = await getCartPricing(
-      req.user.userId,
-      req.body.couponCode || "",
-      req.body.shippingMethodId
-    );
+    } = await getCartPricing(req.user.userId, req.body.couponCode || "", req.body.shippingMethodId);
 
     if (totalAmount <= 0) {
       return res.status(400).json({
@@ -62,14 +58,12 @@ export const createPaymentIntent = async (req, res, next) => {
       shippingMethod: shippingMethod?._id || null,
       shippingAddress: req.body.shippingAddress,
 
-      cartSnapshot: items.map(
-        ({ product, variantId, quantity, price }) => ({
-          product: product._id,
-          variantId,
-          quantity,
-          price,
-        })
-      ),
+      cartSnapshot: items.map(({ product, variantId, quantity, price }) => ({
+        product: product._id,
+        variantId,
+        quantity,
+        price,
+      })),
     });
 
     return res.status(201).json({
@@ -123,10 +117,7 @@ export const stripeWebhook = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (error) {
-    console.error(
-      "Stripe webhook signature error:",
-      error.message
-    );
+    console.error("Stripe webhook signature error:", error.message);
 
     return res.status(400).json({
       success: false,
@@ -137,10 +128,9 @@ export const stripeWebhook = async (req, res) => {
   }
 
   try {
-    const alreadyProcessed =
-      await WebhookEvent.findOne({
-        eventId: event.id,
-      });
+    const alreadyProcessed = await WebhookEvent.findOne({
+      eventId: event.id,
+    });
 
     if (alreadyProcessed) {
       return res.status(200).json({
@@ -149,42 +139,29 @@ export const stripeWebhook = async (req, res) => {
       });
     }
 
-    if (
-      event.type ===
-      "payment_intent.succeeded"
-    ) {
+    if (event.type === "payment_intent.succeeded") {
       const intent = event.data.object;
 
-      const payment =
-        await Payment.findOneAndUpdate(
-          {
-            stripePaymentIntentId:
-              intent.id,
-            status: {
-              $ne: "refunded",
-            },
+      const payment = await Payment.findOneAndUpdate(
+        {
+          stripePaymentIntentId: intent.id,
+          status: {
+            $ne: "refunded",
           },
-          {
-            status: "succeeded",
-          },
-          {
-            returnDocument: "after",
-          }
-        );
+        },
+        {
+          status: "succeeded",
+        },
+        {
+          returnDocument: "after",
+        }
+      );
 
-      if (
-        payment &&
-        !payment.order
-      ) {
+      if (payment && !payment.order) {
         try {
-          await finalizePaidOrder(
-            payment
-          );
+          await finalizePaidOrder(payment);
         } catch (error) {
-          console.error(
-            "Webhook order finalization failed:",
-            error
-          );
+          console.error("Webhook order finalization failed:", error);
 
           /*
            * Do NOT mark the Stripe event as
@@ -193,23 +170,18 @@ export const stripeWebhook = async (req, res) => {
            */
           return res.status(500).json({
             success: false,
-            message:
-              "Order finalization failed",
+            message: "Order finalization failed",
           });
         }
       }
     }
 
-    if (
-      event.type ===
-      "payment_intent.payment_failed"
-    ) {
+    if (event.type === "payment_intent.payment_failed") {
       const intent = event.data.object;
 
       await Payment.findOneAndUpdate(
         {
-          stripePaymentIntentId:
-            intent.id,
+          stripePaymentIntentId: intent.id,
           status: {
             $ne: "refunded",
           },
@@ -220,72 +192,45 @@ export const stripeWebhook = async (req, res) => {
       );
     }
 
-    if (
-      event.type ===
-      "refund.updated"
-    ) {
-      const refund =
-        event.data.object;
+    if (event.type === "refund.updated") {
+      const refund = event.data.object;
 
       await Payment.updateOne(
         {
-          "refunds.stripeRefundId":
-            refund.id,
+          "refunds.stripeRefundId": refund.id,
         },
         {
           $set: {
-            "refunds.$.status":
-              refund.status,
+            "refunds.$.status": refund.status,
           },
         }
       );
 
-      if (
-        refund.status ===
-        "succeeded"
-      ) {
-        const request =
-          await ReturnRequest.findOneAndUpdate(
-            {
-              stripeRefundId:
-                refund.id,
-            },
-            {
-              status: "refunded",
-            },
-            {
-              returnDocument: "after",
-            }
-          );
+      if (refund.status === "succeeded") {
+        const request = await ReturnRequest.findOneAndUpdate(
+          {
+            stripeRefundId: refund.id,
+          },
+          {
+            status: "refunded",
+          },
+          {
+            returnDocument: "after",
+          }
+        );
 
         if (request) {
-          const order =
-            await Order.findById(
-              request.order
-            );
+          const order = await Order.findById(request.order);
 
-          const group =
-            order?.vendorOrders.find(
-              (entry) =>
-                String(
-                  entry.vendor
-                ) ===
-                String(
-                  request.vendor
-                )
-            );
+          const group = order?.vendorOrders.find(
+            (entry) => String(entry.vendor) === String(request.vendor)
+          );
 
-          if (
-            group &&
-            group.status !==
-              "refunded"
-          ) {
-            group.status =
-              "refunded";
+          if (group && group.status !== "refunded") {
+            group.status = "refunded";
 
             group.history.push({
-              status:
-                "refunded",
+              status: "refunded",
             });
 
             await order.save();
@@ -318,15 +263,11 @@ export const stripeWebhook = async (req, res) => {
       });
     }
 
-    console.error(
-      "Stripe webhook processing error:",
-      error
-    );
+    console.error("Stripe webhook processing error:", error);
 
     return res.status(500).json({
       success: false,
-      message:
-        "Webhook processing failed",
+      message: "Webhook processing failed",
       data: null,
       error: null,
     });

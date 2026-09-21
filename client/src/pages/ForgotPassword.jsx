@@ -26,14 +26,28 @@ export default function ForgotPassword() {
       <form className="auth-card" onSubmit={submit}>
         <span className="eyebrow">Account recovery</span>
         <h1>Reset password</h1>
-        <p className="muted">In local development the reset link is printed in the server terminal.</p>
+        <p className="muted">
+          In local development the reset link is printed in the server terminal.
+        </p>
 
         {done ? (
-          <div className="success-note">Reset instructions generated. Check the server console.</div>
+          <div className="success-note">
+            Reset instructions generated. Check the server console.
+          </div>
         ) : (
           <>
-            <label>Email<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></label>
-            <button className="button full" disabled={loading}>{loading ? "Sending..." : "Generate reset link"}</button>
+            <label>
+              Email
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
+            <button className="button full" disabled={loading}>
+              {loading ? "Sending..." : "Generate reset link"}
+            </button>
           </>
         )}
       </form>

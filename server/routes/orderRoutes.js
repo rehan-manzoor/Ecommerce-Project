@@ -1,6 +1,16 @@
 import { validate } from "../middleware/validate.js";
-import { orderSchema } from "../validators/marketplaceValidator.js";import express from "express";
-import { createOrder, getMyOrders, getOrderById, getAllOrders, getVendorOrders, updateOrderStatus, updateVendorOrderStatus, cancelVendorOrder } from "../controllers/orderController.js";
+import { orderSchema } from "../validators/marketplaceValidator.js";
+import express from "express";
+import {
+  createOrder,
+  getMyOrders,
+  getOrderById,
+  getAllOrders,
+  getVendorOrders,
+  updateOrderStatus,
+  updateVendorOrderStatus,
+  cancelVendorOrder,
+} from "../controllers/orderController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
 const router = express.Router();

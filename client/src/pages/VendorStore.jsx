@@ -42,7 +42,9 @@ export default function VendorStore() {
         className="store-banner panel"
         style={
           vendor.bannerImage
-            ? { backgroundImage: `linear-gradient(rgba(15,23,42,.65),rgba(15,23,42,.65)),url(${vendor.bannerImage})` }
+            ? {
+                backgroundImage: `linear-gradient(rgba(15,23,42,.65),rgba(15,23,42,.65)),url(${vendor.bannerImage})`,
+              }
             : undefined
         }
       >
@@ -57,7 +59,9 @@ export default function VendorStore() {
       <div className="section-heading">
         <div>
           <h2>Products</h2>
-          <p className="muted">{products.length} listing{products.length === 1 ? "" : "s"}</p>
+          <p className="muted">
+            {products.length} listing{products.length === 1 ? "" : "s"}
+          </p>
         </div>
       </div>
 
@@ -94,7 +98,10 @@ export default function VendorStore() {
 function StoreSkeleton() {
   return (
     <main className="container page-shell">
-      <div className="skeleton" style={{ height: 260, borderRadius: "var(--r-lg)", marginBottom: 28 }} />
+      <div
+        className="skeleton"
+        style={{ height: 260, borderRadius: "var(--r-lg)", marginBottom: 28 }}
+      />
       <div className="skeleton" style={{ height: 24, width: 180, marginBottom: 20 }} />
       <div className="products-grid">
         {Array.from({ length: 4 }).map((_, i) => (

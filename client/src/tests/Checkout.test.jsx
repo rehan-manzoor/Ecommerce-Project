@@ -1,18 +1,5 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 
@@ -126,9 +113,7 @@ describe("Checkout", () => {
   it("loads cart items and shipping methods", async () => {
     renderCheckout();
 
-    expect(
-      screen.getByText("Loading checkout...")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Loading checkout...")).toBeInTheDocument();
 
     expect(
       await screen.findByRole("heading", {
@@ -136,9 +121,7 @@ describe("Checkout", () => {
       })
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByText("Test Product × 2")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Test Product × 2")).toBeInTheDocument();
 
     expect(
       screen.getByRole("option", {
@@ -146,13 +129,9 @@ describe("Checkout", () => {
       })
     ).toBeInTheDocument();
 
-    expect(
-  screen.getAllByText("$200.00")
-).toHaveLength(2);
+    expect(screen.getAllByText("$200.00")).toHaveLength(2);
 
-    expect(
-      screen.getByText("$210.00 + tax")
-    ).toBeInTheDocument();
+    expect(screen.getByText("$210.00 + tax")).toBeInTheDocument();
   });
 
   it("redirects to cart when the cart is empty", async () => {
@@ -208,14 +187,11 @@ describe("Checkout", () => {
       name: "Shipping details",
     });
 
-    fireEvent.change(
-      screen.getByPlaceholderText("Coupon code"),
-      {
-        target: {
-          value: "save20",
-        },
-      }
-    );
+    fireEvent.change(screen.getByPlaceholderText("Coupon code"), {
+      target: {
+        value: "save20",
+      },
+    });
 
     fireEvent.click(
       screen.getByRole("button", {
@@ -224,25 +200,16 @@ describe("Checkout", () => {
     );
 
     await waitFor(() => {
-      expect(mocks.apiPost).toHaveBeenCalledWith(
-        "/coupons/validate",
-        {
-          code: "save20",
-        }
-      );
+      expect(mocks.apiPost).toHaveBeenCalledWith("/coupons/validate", {
+        code: "save20",
+      });
     });
 
-    expect(
-      await screen.findByText("−$20.00")
-    ).toBeInTheDocument();
+    expect(await screen.findByText("−$20.00")).toBeInTheDocument();
 
-    expect(
-      screen.getByText("$190.00 + tax")
-    ).toBeInTheDocument();
+    expect(screen.getByText("$190.00 + tax")).toBeInTheDocument();
 
-    expect(mocks.notify).toHaveBeenCalledWith(
-      "Coupon applied"
-    );
+    expect(mocks.notify).toHaveBeenCalledWith("Coupon applied");
   });
 
   it("shows an error when coupon validation fails", async () => {
@@ -260,14 +227,11 @@ describe("Checkout", () => {
       name: "Shipping details",
     });
 
-    fireEvent.change(
-      screen.getByPlaceholderText("Coupon code"),
-      {
-        target: {
-          value: "OLDCOUPON",
-        },
-      }
-    );
+    fireEvent.change(screen.getByPlaceholderText("Coupon code"), {
+      target: {
+        value: "OLDCOUPON",
+      },
+    });
 
     fireEvent.click(
       screen.getByRole("button", {
@@ -276,10 +240,7 @@ describe("Checkout", () => {
     );
 
     await waitFor(() => {
-      expect(mocks.notify).toHaveBeenCalledWith(
-        "Coupon expired",
-        "error"
-      );
+      expect(mocks.notify).toHaveBeenCalledWith("Coupon expired", "error");
     });
   });
 
@@ -290,18 +251,13 @@ describe("Checkout", () => {
       name: "Shipping details",
     });
 
-    fireEvent.change(
-      screen.getByLabelText("Shipping method"),
-      {
-        target: {
-          value: "shipping-2",
-        },
-      }
-    );
+    fireEvent.change(screen.getByLabelText("Shipping method"), {
+      target: {
+        value: "shipping-2",
+      },
+    });
 
-    expect(
-      screen.getByText("$225.00 + tax")
-    ).toBeInTheDocument();
+    expect(screen.getByText("$225.00 + tax")).toBeInTheDocument();
   });
 
   it("submits checkout details and navigates to payment", async () => {
@@ -311,59 +267,41 @@ describe("Checkout", () => {
       name: "Shipping details",
     });
 
-    fireEvent.change(
-      screen.getByLabelText("Street address"),
-      {
-        target: {
-          value: "123 Main Road",
-        },
-      }
-    );
+    fireEvent.change(screen.getByLabelText("Street address"), {
+      target: {
+        value: "123 Main Road",
+      },
+    });
 
-    fireEvent.change(
-      screen.getByLabelText("City"),
-      {
-        target: {
-          value: "Lahore",
-        },
-      }
-    );
+    fireEvent.change(screen.getByLabelText("City"), {
+      target: {
+        value: "Lahore",
+      },
+    });
 
-    fireEvent.change(
-      screen.getByLabelText("State / Province"),
-      {
-        target: {
-          value: "Punjab",
-        },
-      }
-    );
+    fireEvent.change(screen.getByLabelText("State / Province"), {
+      target: {
+        value: "Punjab",
+      },
+    });
 
-    fireEvent.change(
-      screen.getByLabelText("Postal code"),
-      {
-        target: {
-          value: "54000",
-        },
-      }
-    );
+    fireEvent.change(screen.getByLabelText("Postal code"), {
+      target: {
+        value: "54000",
+      },
+    });
 
-    fireEvent.change(
-      screen.getByLabelText("Country"),
-      {
-        target: {
-          value: "Pakistan",
-        },
-      }
-    );
+    fireEvent.change(screen.getByLabelText("Country"), {
+      target: {
+        value: "Pakistan",
+      },
+    });
 
-    fireEvent.change(
-      screen.getByPlaceholderText("Coupon code"),
-      {
-        target: {
-          value: "save20",
-        },
-      }
-    );
+    fireEvent.change(screen.getByPlaceholderText("Coupon code"), {
+      target: {
+        value: "save20",
+      },
+    });
 
     fireEvent.click(
       screen.getByRole("button", {
@@ -380,29 +318,26 @@ describe("Checkout", () => {
     );
 
     await waitFor(() => {
-      expect(mocks.navigate).toHaveBeenCalledWith(
-        "/payment",
-        {
-          state: {
-            shippingAddress: {
-              address: "123 Main Road",
-              city: "Lahore",
-              state: "Punjab",
-              postalCode: "54000",
-              country: "Pakistan",
-            },
-            couponCode: "SAVE20",
-            shippingMethodId: "shipping-1",
-            pricing: {
-              subtotalAmount: 200,
-              discountAmount: 20,
-              shippingAmount: 10,
-              taxAmount: 0,
-              totalAmount: 190,
-            },
+      expect(mocks.navigate).toHaveBeenCalledWith("/payment", {
+        state: {
+          shippingAddress: {
+            address: "123 Main Road",
+            city: "Lahore",
+            state: "Punjab",
+            postalCode: "54000",
+            country: "Pakistan",
           },
-        }
-      );
+          couponCode: "SAVE20",
+          shippingMethodId: "shipping-1",
+          pricing: {
+            subtotalAmount: 200,
+            discountAmount: 20,
+            shippingAmount: 10,
+            taxAmount: 0,
+            totalAmount: 190,
+          },
+        },
+      });
     });
   });
 
@@ -413,9 +348,7 @@ describe("Checkout", () => {
       }
 
       if (url === "/shipping") {
-        return Promise.reject(
-          new Error("Shipping unavailable")
-        );
+        return Promise.reject(new Error("Shipping unavailable"));
       }
 
       return Promise.reject(new Error("Unexpected GET request"));
@@ -424,10 +357,7 @@ describe("Checkout", () => {
     renderCheckout();
 
     await waitFor(() => {
-      expect(mocks.notify).toHaveBeenCalledWith(
-        "Shipping unavailable",
-        "error"
-      );
+      expect(mocks.notify).toHaveBeenCalledWith("Shipping unavailable", "error");
     });
   });
 });

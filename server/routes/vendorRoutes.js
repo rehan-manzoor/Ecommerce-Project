@@ -1,6 +1,11 @@
 import express from "express";
 import {
-  createVendor, getMyVendor, updateMyVendor, getVendors, updateVendorStatus, getPublicVendor,
+  createVendor,
+  getMyVendor,
+  updateMyVendor,
+  getVendors,
+  updateVendorStatus,
+  getPublicVendor,
 } from "../controllers/vendorController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";

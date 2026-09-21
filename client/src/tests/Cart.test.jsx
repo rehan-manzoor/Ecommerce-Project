@@ -1,18 +1,5 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 
@@ -84,7 +71,7 @@ const renderCart = () =>
     </MemoryRouter>
   );
 
-  afterEach(() => {
+afterEach(() => {
   cleanup();
 });
 
@@ -127,13 +114,12 @@ describe("Cart", () => {
 
     renderCart();
 
-    expect(
-      await screen.findByText("Your cart is empty")
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Your cart is empty")).toBeInTheDocument();
 
-    expect(
-      screen.getByRole("link", { name: "Browse products" })
-    ).toHaveAttribute("href", "/products");
+    expect(screen.getByRole("link", { name: "Browse products" })).toHaveAttribute(
+      "href",
+      "/products"
+    );
   });
 
   it("loads and displays a guest cart", async () => {
@@ -151,19 +137,19 @@ describe("Cart", () => {
 
     expect(
       await screen.findByRole("heading", {
-  name: "Test Product",
-})
+        name: "Test Product",
+      })
     ).toBeInTheDocument();
 
     expect(screen.getByText("$25.00 each")).toBeInTheDocument();
 
-expect(screen.getAllByText("$50.00")).toHaveLength(3);
+    expect(screen.getAllByText("$50.00")).toHaveLength(3);
 
-expect(
-  screen.getByRole("button", {
-    name: "Login to checkout",
-  })
-).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: "Login to checkout",
+      })
+    ).toBeInTheDocument();
   });
 
   it("updates quantity for a guest cart", async () => {
@@ -221,9 +207,7 @@ expect(
       expect(mocks.setGuestCart).toHaveBeenCalledWith([]);
     });
 
-    expect(
-      screen.getByText("Your cart is empty")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Your cart is empty")).toBeInTheDocument();
   });
 
   it("clears a guest cart", async () => {
@@ -249,9 +233,7 @@ expect(
 
     expect(mocks.clearGuestCart).toHaveBeenCalledTimes(1);
 
-    expect(
-      screen.getByText("Your cart is empty")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Your cart is empty")).toBeInTheDocument();
   });
 
   it("loads cart data from the API for a logged-in user", async () => {
@@ -280,9 +262,7 @@ expect(
       expect(mocks.apiGet).toHaveBeenCalledWith("/cart");
     });
 
-    expect(
-      await screen.findByText("Test Product")
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Test Product")).toBeInTheDocument();
 
     expect(
       screen.getByRole("button", {
@@ -335,14 +315,11 @@ expect(
     );
 
     await waitFor(() => {
-      expect(mocks.apiPut).toHaveBeenCalledWith(
-        "/cart/update",
-        {
-          productId: "product-1",
-          quantity: 2,
-          variantId: null,
-        }
-      );
+      expect(mocks.apiPut).toHaveBeenCalledWith("/cart/update", {
+        productId: "product-1",
+        quantity: 2,
+        variantId: null,
+      });
     });
 
     expect(screen.getByText("2")).toBeInTheDocument();
@@ -386,14 +363,10 @@ expect(
     );
 
     await waitFor(() => {
-      expect(mocks.apiDelete).toHaveBeenCalledWith(
-        "/cart/remove/product-1"
-      );
+      expect(mocks.apiDelete).toHaveBeenCalledWith("/cart/remove/product-1");
     });
 
-    expect(
-      screen.getByText("Your cart is empty")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Your cart is empty")).toBeInTheDocument();
   });
 
   it("sends a logged-in user to checkout", async () => {
@@ -425,9 +398,7 @@ expect(
       })
     );
 
-    expect(mocks.navigate).toHaveBeenCalledWith(
-      "/checkout"
-    );
+    expect(mocks.navigate).toHaveBeenCalledWith("/checkout");
   });
 
   it("sends a guest to login before checkout", async () => {
@@ -451,13 +422,10 @@ expect(
       })
     );
 
-    expect(mocks.navigate).toHaveBeenCalledWith(
-      "/login",
-      {
-        state: {
-          from: "/checkout",
-        },
-      }
-    );
+    expect(mocks.navigate).toHaveBeenCalledWith("/login", {
+      state: {
+        from: "/checkout",
+      },
+    });
   });
 });

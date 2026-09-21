@@ -1,4 +1,3 @@
-
 export function VendorContentSkeleton() {
   return (
     <>
@@ -15,10 +14,7 @@ export function VendorContentSkeleton() {
         {Array.from({
           length: 4,
         }).map((_, index) => (
-          <div
-            className="stat-card"
-            key={index}
-          >
+          <div className="stat-card" key={index}>
             <div
               className="skeleton"
               style={{

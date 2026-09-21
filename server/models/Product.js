@@ -16,7 +16,14 @@ const productSchema = new mongoose.Schema(
     tags: { type: [String], default: [] },
     specifications: { type: Map, of: String, default: {} },
     featured: { type: Boolean, default: false },
-    variants: [{ attributes: { type: Map, of: String, required: true }, sku: { type: String, required: true }, price: { type: Number, min: 0, required: true }, stock: { type: Number, min: 0, required: true } }],
+    variants: [
+      {
+        attributes: { type: Map, of: String, required: true },
+        sku: { type: String, required: true },
+        price: { type: Number, min: 0, required: true },
+        stock: { type: Number, min: 0, required: true },
+      },
+    ],
     images: { type: [String], default: [] },
     status: { type: String, enum: ["draft", "active", "inactive"], default: "active" },
     approvalStatus: {

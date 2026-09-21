@@ -28,8 +28,7 @@ test.describe.serial("Vendor product mutation flow", () => {
 
     const responsePromise = page.waitForResponse(
       (response) =>
-        response.url().includes("/api/users/login") &&
-        response.request().method() === "POST"
+        response.url().includes("/api/users/login") && response.request().method() === "POST"
     );
 
     await page.getByRole("button", { name: "Sign in" }).click();
@@ -77,36 +76,41 @@ test.describe.serial("Vendor product mutation flow", () => {
     ).toBeVisible();
 
     await page.getByLabel("Name").fill(productName);
-await page.getByLabel("Brand").fill("E2E Brand");
+    await page.getByLabel("Brand").fill("E2E Brand");
 
-await page
-  .getByLabel("Description")
-  .fill("Product created automatically by Playwright E2E testing.");
+    await page
+      .getByLabel("Description")
+      .fill("Product created automatically by Playwright E2E testing.");
 
-await page.getByRole("spinbutton", {
-  name: "Price",
-  exact: true,
-}).fill("2499");
+    await page
+      .getByRole("spinbutton", {
+        name: "Price",
+        exact: true,
+      })
+      .fill("2499");
 
-await page.getByRole("spinbutton", {
-  name: "Stock",
-  exact: true,
-}).fill("10");
+    await page
+      .getByRole("spinbutton", {
+        name: "Stock",
+        exact: true,
+      })
+      .fill("10");
 
-await page
-  .getByLabel("SKU", { exact: true })
-  .first()
-  .fill(`E2E-${unique}`);
+    await page.getByLabel("SKU", { exact: true }).first().fill(`E2E-${unique}`);
 
-await page.getByRole("spinbutton", {
-  name: "Sale price",
-  exact: true,
-}).fill("2299");
+    await page
+      .getByRole("spinbutton", {
+        name: "Sale price",
+        exact: true,
+      })
+      .fill("2299");
 
-await page.getByRole("spinbutton", {
-  name: "Low stock threshold",
-  exact: true,
-}).fill("3");
+    await page
+      .getByRole("spinbutton", {
+        name: "Low stock threshold",
+        exact: true,
+      })
+      .fill("3");
 
     const categorySelect = page.getByLabel("Category");
 
@@ -124,14 +128,11 @@ await page.getByRole("spinbutton", {
 
     await categorySelect.selectOption({ index: 1 });
 
-    await page
-      .getByLabel("Listing status")
-      .selectOption("active");
+    await page.getByLabel("Listing status").selectOption("active");
 
     const createResponsePromise = page.waitForResponse(
       (response) =>
-        response.url().includes("/api/products") &&
-        response.request().method() === "POST"
+        response.url().includes("/api/products") && response.request().method() === "POST"
     );
 
     await page
@@ -158,9 +159,11 @@ await page.getByRole("spinbutton", {
     ).toBeVisible();
 
     await expect(
-      page.getByText("pending", {
-        exact: true,
-      }).last()
+      page
+        .getByText("pending", {
+          exact: true,
+        })
+        .last()
     ).toBeVisible();
   });
 
@@ -196,15 +199,16 @@ await page.getByRole("spinbutton", {
 
     await nameInput.fill(updatedProductName);
 
-    await page.getByRole("spinbutton", {
-  name: "Stock",
-  exact: true,
-}).fill("15");
+    await page
+      .getByRole("spinbutton", {
+        name: "Stock",
+        exact: true,
+      })
+      .fill("15");
 
     const updateResponsePromise = page.waitForResponse(
       (response) =>
-        response.url().includes("/api/products/") &&
-        response.request().method() === "PUT"
+        response.url().includes("/api/products/") && response.request().method() === "PUT"
     );
 
     await page
@@ -225,20 +229,17 @@ await page.getByRole("spinbutton", {
     }
 
     const updatedProductCard = page
-  .locator(".management-card")
-  .filter({
-    has: page.getByText(updatedProductName, {
-      exact: true,
-    }),
-  })
-  .first();
+      .locator(".management-card")
+      .filter({
+        has: page.getByText(updatedProductName, {
+          exact: true,
+        }),
+      })
+      .first();
 
-await expect(updatedProductCard).toBeVisible();
+    await expect(updatedProductCard).toBeVisible();
 
-await expect(
-  updatedProductCard.getByText(/Stock 15/i)
-).toBeVisible();
-
+    await expect(updatedProductCard.getByText(/Stock 15/i)).toBeVisible();
   });
 
   test("vendor can delete the E2E product", async () => {
@@ -266,8 +267,7 @@ await expect(
 
     const deleteResponsePromise = page.waitForResponse(
       (response) =>
-        response.url().includes("/api/products/") &&
-        response.request().method() === "DELETE"
+        response.url().includes("/api/products/") && response.request().method() === "DELETE"
     );
 
     await dialog

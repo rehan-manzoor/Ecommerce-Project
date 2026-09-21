@@ -43,7 +43,8 @@ export default function App() {
   const location = useLocation();
   const { ready } = useAuth();
   if (!ready) return <div className="state-card page-state">Restoring session...</div>;
-  const isDashboard = location.pathname.startsWith("/admin") || location.pathname.startsWith("/vendor");
+  const isDashboard =
+    location.pathname.startsWith("/admin") || location.pathname.startsWith("/vendor");
 
   return (
     <div className="app-shell">
@@ -61,17 +62,94 @@ export default function App() {
           <Route path="/products/:id" element={<ProductDetails />} />
           <Route path="/store/:slug" element={<VendorStore />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-          <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-          <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
-          <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-          <Route path="/returns" element={<ProtectedRoute><Returns /></ProtectedRoute>} />
-          <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/become-vendor" element={<ProtectedRoute><BecomeVendor /></ProtectedRoute>} />
-          <Route path="/admin/*" element={<AdminRoute><Admin /></AdminRoute>} />
-          <Route path="/vendor/*" element={<VendorRoute><Vendor /></VendorRoute>} />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment"
+            element={
+              <ProtectedRoute>
+                <Payment />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment-success"
+            element={
+              <ProtectedRoute>
+                <PaymentSuccess />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/wishlist"
+            element={
+              <ProtectedRoute>
+                <Wishlist />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/returns"
+            element={
+              <ProtectedRoute>
+                <Returns />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <Orders />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/become-vendor"
+            element={
+              <ProtectedRoute>
+                <BecomeVendor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/*"
+            element={
+              <AdminRoute>
+                <Admin />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/vendor/*"
+            element={
+              <VendorRoute>
+                <Vendor />
+              </VendorRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

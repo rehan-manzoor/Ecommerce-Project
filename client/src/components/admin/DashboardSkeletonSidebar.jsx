@@ -4,9 +4,7 @@ export function DashboardSkeletonSidebar() {
   return (
     <aside className="dashboard-sidebar">
       <div>
-        <span className="eyebrow">
-          Admin
-        </span>
+        <span className="eyebrow">Admin</span>
         <h2>Control center</h2>
       </div>
 

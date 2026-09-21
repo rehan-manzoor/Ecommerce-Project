@@ -1,15 +1,6 @@
+export const ORDER_STATUSES = ["processing", "shipped", "delivered"];
 
-export const ORDER_STATUSES = [
-  "processing",
-  "shipped",
-  "delivered",
-];
-
-export const USER_ROLES = [
-  "customer",
-  "vendor",
-  "admin",
-];
+export const USER_ROLES = ["customer", "vendor", "admin"];
 
 export const TABS = [
   "overview",
@@ -40,12 +31,8 @@ export const EMPTY_COUPON = {
   active: true,
 };
 
-export const capitalize = (word) =>
-  word[0].toUpperCase() + word.slice(1);
+export const capitalize = (word) => word[0].toUpperCase() + word.slice(1);
 
-export const money = (value) =>
-  `$${Number(value || 0).toFixed(2)}`;
+export const money = (value) => `$${Number(value || 0).toFixed(2)}`;
 
-export const shortId = (id) =>
-  `#${id.slice(-8).toUpperCase()}`;
-
+export const shortId = (id) => `#${id.slice(-8).toUpperCase()}`;

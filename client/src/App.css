@@ -52,7 +52,9 @@
   font-size: 0.92rem;
   padding: 8px 12px;
   border-radius: var(--r-sm);
-  transition: color var(--fast) var(--ease), background var(--fast) var(--ease);
+  transition:
+    color var(--fast) var(--ease),
+    background var(--fast) var(--ease);
 }
 .nav-links > a:hover {
   color: var(--ink);
@@ -62,7 +64,6 @@
   color: var(--brand);
   background: var(--brand-light);
 }
-
 
 /* Keep CTA buttons accessible inside navbar.
    .nav-links > a is more specific than .button,
@@ -74,7 +75,6 @@
 .nav-links > a.button:hover {
   color: #ffffff;
 }
-
 
 .nav-button {
   border: 0;
@@ -171,7 +171,8 @@
    ========================================================================== */
 .hero {
   padding: 84px 0 72px;
-  background: radial-gradient(circle at 88% 12%, #e3e6ff 0%, transparent 40%),
+  background:
+    radial-gradient(circle at 88% 12%, #e3e6ff 0%, transparent 40%),
     linear-gradient(160deg, #fafbff 0%, #f1f2fb 100%);
   border-bottom: 1px solid var(--line);
 }
@@ -279,7 +280,9 @@
   padding: 22px;
   display: flex;
   gap: 14px;
-  transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease),
+  transition:
+    transform var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease),
     border-color var(--fast) var(--ease);
 }
 .category-card:hover {
@@ -322,7 +325,9 @@
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   overflow: hidden;
-  transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease),
+  transition:
+    transform var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease),
     border-color var(--fast) var(--ease);
   min-width: 0;
   display: flex;
@@ -457,7 +462,9 @@
   padding: 9px 14px;
   font-weight: 700;
   font-size: 0.88rem;
-  transition: background var(--fast) var(--ease), border-color var(--fast) var(--ease);
+  transition:
+    background var(--fast) var(--ease),
+    border-color var(--fast) var(--ease);
 }
 .pagination button:hover:not(:disabled) {
   background: var(--surface-sunken);
@@ -1003,7 +1010,9 @@
   padding: 11px 13px;
   font-weight: 700;
   font-size: 0.9rem;
-  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+  transition:
+    background var(--fast) var(--ease),
+    color var(--fast) var(--ease);
 }
 .dashboard-sidebar button.active,
 .dashboard-sidebar button:hover {

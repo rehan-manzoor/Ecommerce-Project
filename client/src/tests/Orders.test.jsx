@@ -1,18 +1,5 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router";
 
@@ -167,9 +154,7 @@ describe("Orders", () => {
       })
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByText("Test Store · confirmed")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Test Store · confirmed")).toBeInTheDocument();
 
     expect(
       screen.getByRole("link", {
@@ -248,21 +233,16 @@ describe("Orders", () => {
     );
 
     await waitFor(() => {
-      expect(mocks.apiPost).toHaveBeenCalledWith(
-        "/orders/order-12345678/vendors/vendor-1/cancel",
-        {
-          reason: "Changed my mind",
-        }
-      );
+      expect(mocks.apiPost).toHaveBeenCalledWith("/orders/order-12345678/vendors/vendor-1/cancel", {
+        reason: "Changed my mind",
+      });
     });
 
     await waitFor(() => {
       expect(mocks.apiGet).toHaveBeenCalledTimes(2);
     });
 
-    expect(mocks.notify).toHaveBeenCalledWith(
-      "Cancellation and refund initiated"
-    );
+    expect(mocks.notify).toHaveBeenCalledWith("Cancellation and refund initiated");
 
     expect(
       screen.getByRole("heading", {
@@ -307,10 +287,7 @@ describe("Orders", () => {
     );
 
     await waitFor(() => {
-      expect(mocks.notify).toHaveBeenCalledWith(
-        "Cancellation is not allowed",
-        "error"
-      );
+      expect(mocks.notify).toHaveBeenCalledWith("Cancellation is not allowed", "error");
     });
   });
 
@@ -323,9 +300,7 @@ describe("Orders", () => {
 
     renderOrders();
 
-    expect(
-      await screen.findByText("Tracking: TCS · TRACK123")
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Tracking: TCS · TRACK123")).toBeInTheDocument();
 
     expect(
       screen.getByRole("button", {
@@ -363,20 +338,15 @@ describe("Orders", () => {
     });
 
     await waitFor(() => {
-      expect(mocks.apiPost).toHaveBeenCalledWith(
-        "/returns",
-        {
-          orderId: "order-delivered-87654321",
-          productId: "product-1",
-          quantity: 2,
-          reason: "Item arrived damaged",
-        }
-      );
+      expect(mocks.apiPost).toHaveBeenCalledWith("/returns", {
+        orderId: "order-delivered-87654321",
+        productId: "product-1",
+        quantity: 2,
+        reason: "Item arrived damaged",
+      });
     });
 
-    expect(mocks.notify).toHaveBeenCalledWith(
-      "Return requested"
-    );
+    expect(mocks.notify).toHaveBeenCalledWith("Return requested");
   });
 
   it("shows an error when a return request fails", async () => {
@@ -407,10 +377,7 @@ describe("Orders", () => {
     );
 
     await waitFor(() => {
-      expect(mocks.notify).toHaveBeenCalledWith(
-        "Return window expired",
-        "error"
-      );
+      expect(mocks.notify).toHaveBeenCalledWith("Return window expired", "error");
     });
   });
 });

@@ -34,7 +34,11 @@ export default function Cart() {
   const updateQuantity = async (productId, quantity, variantId = null) => {
     try {
       if (!user) {
-        const items = getGuestCart().map((item) => (item.product._id === productId && (item.variantId || null) === variantId ? { ...item, quantity } : item));
+        const items = getGuestCart().map((item) =>
+          item.product._id === productId && (item.variantId || null) === variantId
+            ? { ...item, quantity }
+            : item
+        );
         setGuestCart(items);
         setCart({ items });
       } else {
@@ -48,11 +52,15 @@ export default function Cart() {
 
   const remove = async (productId, variantId = null) => {
     if (!user) {
-      const items = getGuestCart().filter((item) => !(item.product._id === productId && (item.variantId || null) === variantId));
+      const items = getGuestCart().filter(
+        (item) => !(item.product._id === productId && (item.variantId || null) === variantId)
+      );
       setGuestCart(items);
       setCart({ items });
     } else {
-      const r = await api.delete(`/cart/remove/${productId}${variantId ? `?variantId=${variantId}` : ""}`);
+      const r = await api.delete(
+        `/cart/remove/${productId}${variantId ? `?variantId=${variantId}` : ""}`
+      );
       setCart(r.data.data);
     }
   };
@@ -67,7 +75,16 @@ export default function Cart() {
     }
   };
 
-  const total = cart.items.reduce((sum, item) => sum + (item.variantId ? item.product.variants?.find((variant) => variant._id === item.variantId)?.price || item.product.price : item.product.salePrice ?? item.product.price) * item.quantity, 0);
+  const total = cart.items.reduce(
+    (sum, item) =>
+      sum +
+      (item.variantId
+        ? item.product.variants?.find((variant) => variant._id === item.variantId)?.price ||
+          item.product.price
+        : (item.product.salePrice ?? item.product.price)) *
+        item.quantity,
+    0
+  );
 
   if (loading) return <CartSkeleton />;
 
@@ -82,7 +99,9 @@ export default function Cart() {
         <div className="state-card">
           <h2>Your cart is empty</h2>
           <p className="muted">Browse the marketplace and add something you like.</p>
-          <Link className="button" to="/products">Browse products</Link>
+          <Link className="button" to="/products">
+            Browse products
+          </Link>
         </div>
       ) : (
         <div className="cart-layout">
@@ -90,23 +109,77 @@ export default function Cart() {
             {cart.items.map((item) => (
               <article className="cart-item" key={`${item.product._id}-${item.variantId || ""}`}>
                 <div className="cart-thumb">
-                  {item.product.images?.[0] ? <img src={item.product.images[0]} alt={item.product.name} /> : "No image"}
+                  {item.product.images?.[0] ? (
+                    <img src={item.product.images[0]} alt={item.product.name} />
+                  ) : (
+                    "No image"
+                  )}
                 </div>
 
                 <div className="cart-main">
-                  <Link to={`/products/${item.product._id}`}><h3>{item.product.name}</h3></Link>
-                  <p>${(item.variantId ? item.product.variants?.find((variant) => variant._id === item.variantId)?.price || item.product.price : item.product.salePrice ?? item.product.price).toFixed(2)} each</p>
-                  {item.variantId && <p>{Object.values(item.product.variants?.find((variant) => variant._id === item.variantId)?.attributes || {}).join(" / ")}</p>}
+                  <Link to={`/products/${item.product._id}`}>
+                    <h3>{item.product.name}</h3>
+                  </Link>
+                  <p>
+                    $
+                    {(item.variantId
+                      ? item.product.variants?.find((variant) => variant._id === item.variantId)
+                          ?.price || item.product.price
+                      : (item.product.salePrice ?? item.product.price)
+                    ).toFixed(2)}{" "}
+                    each
+                  </p>
+                  {item.variantId && (
+                    <p>
+                      {Object.values(
+                        item.product.variants?.find((variant) => variant._id === item.variantId)
+                          ?.attributes || {}
+                      ).join(" / ")}
+                    </p>
+                  )}
                   <div className="quantity-row compact">
-                    <button disabled={item.quantity <= 1} onClick={() => updateQuantity(item.product._id, item.quantity - 1, item.variantId)}>−</button>
+                    <button
+                      disabled={item.quantity <= 1}
+                      onClick={() =>
+                        updateQuantity(item.product._id, item.quantity - 1, item.variantId)
+                      }
+                    >
+                      −
+                    </button>
                     <span>{item.quantity}</span>
-                    <button disabled={item.quantity >= (item.variantId ? item.product.variants?.find((variant) => variant._id === item.variantId)?.stock || 0 : item.product.stock)} onClick={() => updateQuantity(item.product._id, item.quantity + 1, item.variantId)}>+</button>
+                    <button
+                      disabled={
+                        item.quantity >=
+                        (item.variantId
+                          ? item.product.variants?.find((variant) => variant._id === item.variantId)
+                              ?.stock || 0
+                          : item.product.stock)
+                      }
+                      onClick={() =>
+                        updateQuantity(item.product._id, item.quantity + 1, item.variantId)
+                      }
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
 
                 <div className="cart-end">
-                  <strong>${((item.variantId ? item.product.variants?.find((variant) => variant._id === item.variantId)?.price || item.product.price : item.product.salePrice ?? item.product.price) * item.quantity).toFixed(2)}</strong>
-                  <button className="text-button danger" onClick={() => remove(item.product._id, item.variantId)}>Remove</button>
+                  <strong>
+                    $
+                    {(
+                      (item.variantId
+                        ? item.product.variants?.find((variant) => variant._id === item.variantId)
+                            ?.price || item.product.price
+                        : (item.product.salePrice ?? item.product.price)) * item.quantity
+                    ).toFixed(2)}
+                  </strong>
+                  <button
+                    className="text-button danger"
+                    onClick={() => remove(item.product._id, item.variantId)}
+                  >
+                    Remove
+                  </button>
                 </div>
               </article>
             ))}
@@ -114,19 +187,36 @@ export default function Cart() {
 
           <aside className="summary-card panel">
             <h2>Order summary</h2>
-            <div className="summary-row"><span>Subtotal</span><strong>${total.toFixed(2)}</strong></div>
-            <div className="summary-row"><span>Shipping</span><strong>Free</strong></div>
-            <div className="summary-total"><span>Total</span><strong>${total.toFixed(2)}</strong></div>
+            <div className="summary-row">
+              <span>Subtotal</span>
+              <strong>${total.toFixed(2)}</strong>
+            </div>
+            <div className="summary-row">
+              <span>Shipping</span>
+              <strong>Free</strong>
+            </div>
+            <div className="summary-total">
+              <span>Total</span>
+              <strong>${total.toFixed(2)}</strong>
+            </div>
 
             <button
               className="button full"
-              onClick={() => (user ? navigate("/checkout") : navigate("/login", { state: { from: "/checkout" } }))}
+              onClick={() =>
+                user ? navigate("/checkout") : navigate("/login", { state: { from: "/checkout" } })
+              }
             >
               {user ? "Proceed to checkout" : "Login to checkout"}
             </button>
-            <button className="button ghost full" onClick={clear}>Clear cart</button>
+            <button className="button ghost full" onClick={clear}>
+              Clear cart
+            </button>
 
-            {!user && <p className="muted small-text">Your guest cart will merge automatically after login.</p>}
+            {!user && (
+              <p className="muted small-text">
+                Your guest cart will merge automatically after login.
+              </p>
+            )}
           </aside>
         </div>
       )}

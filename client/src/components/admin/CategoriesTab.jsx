@@ -1,25 +1,12 @@
-
-export function CategoriesTab({
-  categories,
-  form,
-  setForm,
-  onCreate,
-  onEdit,
-  onDelete,
-}) {
+export function CategoriesTab({ categories, form, setForm, onCreate, onEdit, onDelete }) {
   return (
     <>
       <div className="page-title">
         <h1>Categories</h1>
-        <p>
-          Organize the catalog vendors list products under.
-        </p>
+        <p>Organize the catalog vendors list products under.</p>
       </div>
 
-      <form
-        className="panel inline-admin-form"
-        onSubmit={onCreate}
-      >
+      <form className="panel inline-admin-form" onSubmit={onCreate}>
         <input
           required
           placeholder="Category name"
@@ -52,23 +39,16 @@ export function CategoriesTab({
             })
           }
         >
-          <option value="">
-            No parent
-          </option>
+          <option value="">No parent</option>
 
           {categories.map((category) => (
-            <option
-              key={category._id}
-              value={category._id}
-            >
+            <option key={category._id} value={category._id}>
               {category.name}
             </option>
           ))}
         </select>
 
-        <button className="button">
-          Create
-        </button>
+        <button className="button">Create</button>
       </form>
 
       <div className="table-wrap panel">
@@ -87,22 +67,13 @@ export function CategoriesTab({
               <tr key={category._id}>
                 <td>{category.name}</td>
                 <td>{category.description}</td>
-                <td>
-                  {category.isActive ? "Active" : "Inactive"}
-                </td>
+                <td>{category.isActive ? "Active" : "Inactive"}</td>
 
                 <td>
-                  <button
-                    className="text-button"
-                    onClick={() => onEdit(category)}
-                  >
+                  <button className="text-button" onClick={() => onEdit(category)}>
                     Edit
                   </button>{" "}
-
-                  <button
-                    className="text-button danger"
-                    onClick={() => onDelete(category)}
-                  >
+                  <button className="text-button danger" onClick={() => onDelete(category)}>
                     Delete
                   </button>
                 </td>

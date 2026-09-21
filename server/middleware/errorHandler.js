@@ -13,10 +13,7 @@ export const errorHandler = (err, _req, res, _next) => {
     status = 409;
     message = "Duplicate value";
     errors = Object.keys(err.keyPattern || {});
-  } else if (
-    err instanceof mongoose.Error.CastError ||
-    err.name === "CastError"
-  ) {
+  } else if (err instanceof mongoose.Error.CastError || err.name === "CastError") {
     status = 400;
     message = "Invalid identifier";
   } else if (err.name === "ValidationError") {

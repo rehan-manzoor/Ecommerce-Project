@@ -61,7 +61,10 @@ export const DialogProvider = ({ children }) => {
       {children}
 
       {dialog && (
-        <div className="dialog-overlay" onMouseDown={(e) => e.target === e.currentTarget && close(null)}>
+        <div
+          className="dialog-overlay"
+          onMouseDown={(e) => e.target === e.currentTarget && close(null)}
+        >
           <form
             className="dialog-card panel"
             onSubmit={submit}
@@ -97,7 +100,10 @@ export const DialogProvider = ({ children }) => {
               <button type="button" className="button ghost" onClick={() => close(null)}>
                 {dialog.cancelLabel || "Cancel"}
               </button>
-              <button className={`button ${dialog.danger ? "danger" : ""}`} autoFocus={!dialog.fields?.length}>
+              <button
+                className={`button ${dialog.danger ? "danger" : ""}`}
+                autoFocus={!dialog.fields?.length}
+              >
                 {dialog.confirmLabel || "Confirm"}
               </button>
             </div>

@@ -3,10 +3,7 @@ import api from "../../api/axios";
 import { notify } from "../Toast";
 import { money } from "./shared.js";
 
-export function ShippingManagement({
-  methods,
-  onChange,
-}) {
+export function ShippingManagement({ methods, onChange }) {
   const [form, setForm] = useState({
     name: "",
     fee: 0,
@@ -33,10 +30,7 @@ export function ShippingManagement({
 
       await onChange();
     } catch (error) {
-      notify(
-        error.response?.data?.message || "Unable to save",
-        "error"
-      );
+      notify(error.response?.data?.message || "Unable to save", "error");
     }
   };
 
@@ -58,10 +52,7 @@ export function ShippingManagement({
         <h1>Shipping methods</h1>
       </div>
 
-      <form
-        className="panel inline-admin-form"
-        onSubmit={save}
-      >
+      <form className="panel inline-admin-form" onSubmit={save}>
         <input
           required
           placeholder="Method name"
@@ -101,27 +92,18 @@ export function ShippingManagement({
           }
         />
 
-        <button className="button">
-          Add method
-        </button>
+        <button className="button">Add method</button>
       </form>
 
       <div className="management-list">
         {methods.map((method) => (
-          <article
-            className="management-card panel"
-            key={method._id}
-          >
+          <article className="management-card panel" key={method._id}>
             <span>
-              {method.name} · {money(method.fee)} ·{" "}
-              {method.estimatedDays} days ·{" "}
+              {method.name} · {money(method.fee)} · {method.estimatedDays} days ·{" "}
               {method.active ? "Active" : "Inactive"}
             </span>
 
-            <button
-              className="button ghost small"
-              onClick={() => toggle(method)}
-            >
+            <button className="button ghost small" onClick={() => toggle(method)}>
               {method.active ? "Disable" : "Enable"}
             </button>
           </article>

@@ -19,8 +19,7 @@ test.describe.serial("Admin product moderation mutation flow", () => {
 
     const loginResponsePromise = page.waitForResponse(
       (response) =>
-        response.url().includes("/api/users/login") &&
-        response.request().method() === "POST"
+        response.url().includes("/api/users/login") && response.request().method() === "POST"
     );
 
     await page
@@ -51,58 +50,40 @@ test.describe.serial("Admin product moderation mutation flow", () => {
     const adminPassword = process.env.E2E_ADMIN_PASSWORD;
 
     if (!vendorEmail || !vendorPassword) {
-      throw new Error(
-        "Set E2E_VENDOR_EMAIL and E2E_VENDOR_PASSWORD before running this test."
-      );
+      throw new Error("Set E2E_VENDOR_EMAIL and E2E_VENDOR_PASSWORD before running this test.");
     }
 
     if (!adminEmail || !adminPassword) {
-      throw new Error(
-        "Set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD before running this test."
-      );
+      throw new Error("Set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD before running this test.");
     }
 
     vendorContext = await browser.newContext();
     vendorPage = await vendorContext.newPage();
 
-    await login(
-      vendorPage,
-      vendorEmail,
-      vendorPassword,
-      "Vendor"
-    );
+    await login(vendorPage, vendorEmail, vendorPassword, "Vendor");
 
     adminContext = await browser.newContext();
     adminPage = await adminContext.newPage();
 
-    await login(
-      adminPage,
-      adminEmail,
-      adminPassword,
-      "Admin"
-    );
+    await login(adminPage, adminEmail, adminPassword, "Admin");
   });
 
   test.afterAll(async () => {
-  try {
-    await adminPage?.request.post(
-      "http://localhost:5000/api/users/logout"
-    );
-  } catch {
-    // Ignore cleanup failures.
-  }
+    try {
+      await adminPage?.request.post("http://localhost:5000/api/users/logout");
+    } catch {
+      // Ignore cleanup failures.
+    }
 
-  try {
-    await vendorPage?.request.post(
-      "http://localhost:5000/api/users/logout"
-    );
-  } catch {
-    // Ignore cleanup failures.
-  }
+    try {
+      await vendorPage?.request.post("http://localhost:5000/api/users/logout");
+    } catch {
+      // Ignore cleanup failures.
+    }
 
-  await adminContext?.close();
-  await vendorContext?.close();
-});
+    await adminContext?.close();
+    await vendorContext?.close();
+  });
 
   test("vendor creates a product pending admin approval", async () => {
     await vendorPage.goto("/vendor");
@@ -130,19 +111,13 @@ test.describe.serial("Admin product moderation mutation flow", () => {
       })
     ).toBeVisible();
 
-    await vendorPage
-      .getByLabel("Name")
-      .fill(productName);
+    await vendorPage.getByLabel("Name").fill(productName);
 
-    await vendorPage
-      .getByLabel("Brand")
-      .fill("E2E Moderation Brand");
+    await vendorPage.getByLabel("Brand").fill("E2E Moderation Brand");
 
     await vendorPage
       .getByLabel("Description")
-      .fill(
-        "Temporary Playwright product created to test the complete admin moderation workflow."
-      );
+      .fill("Temporary Playwright product created to test the complete admin moderation workflow.");
 
     await vendorPage
       .getByRole("spinbutton", {
@@ -179,16 +154,13 @@ test.describe.serial("Admin product moderation mutation flow", () => {
       })
       .fill("5");
 
-    const categorySelect =
-      vendorPage.getByLabel("Category");
+    const categorySelect = vendorPage.getByLabel("Category");
 
     await expect(categorySelect).toBeVisible();
 
-    const categoryOptions =
-      categorySelect.locator("option");
+    const categoryOptions = categorySelect.locator("option");
 
-    const categoryCount =
-      await categoryOptions.count();
+    const categoryCount = await categoryOptions.count();
 
     if (categoryCount <= 1) {
       throw new Error(
@@ -200,16 +172,12 @@ test.describe.serial("Admin product moderation mutation flow", () => {
       index: 1,
     });
 
-    await vendorPage
-      .getByLabel("Listing status")
-      .selectOption("active");
+    await vendorPage.getByLabel("Listing status").selectOption("active");
 
-    const createResponsePromise =
-      vendorPage.waitForResponse(
-        (response) =>
-          response.url().includes("/api/products") &&
-          response.request().method() === "POST"
-      );
+    const createResponsePromise = vendorPage.waitForResponse(
+      (response) =>
+        response.url().includes("/api/products") && response.request().method() === "POST"
+    );
 
     await vendorPage
       .getByRole("button", {
@@ -218,12 +186,10 @@ test.describe.serial("Admin product moderation mutation flow", () => {
       })
       .click();
 
-    const createResponse =
-      await createResponsePromise;
+    const createResponse = await createResponsePromise;
 
     if (!createResponse.ok()) {
-      const body =
-        await createResponse.text();
+      const body = await createResponse.text();
 
       throw new Error(
         `Product creation failed: ${createResponse.status()} ${createResponse.statusText()}\n${body}`
@@ -241,9 +207,7 @@ test.describe.serial("Admin product moderation mutation flow", () => {
 
     await expect(productCard).toBeVisible();
 
-    await expect(
-      productCard.getByText(/pending/i)
-    ).toBeVisible();
+    await expect(productCard.getByText(/pending/i)).toBeVisible();
   });
 
   test("admin can find and approve the pending product", async () => {
@@ -276,65 +240,46 @@ test.describe.serial("Admin product moderation mutation flow", () => {
 
     await expect(productCard).toBeVisible();
 
-    const approveButton = productCard.getByRole(
-      "button",
-      {
-        name: /approve/i,
-      }
-    );
+    const approveButton = productCard.getByRole("button", {
+      name: /approve/i,
+    });
 
     await expect(approveButton).toBeVisible();
 
-    const approvalResponsePromise =
-      adminPage.waitForResponse(
-        (response) =>
-          response.url().includes("/api/") &&
-          response.request().method() !== "GET" &&
-          response.ok()
-      );
+    const approvalResponsePromise = adminPage.waitForResponse(
+      (response) =>
+        response.url().includes("/api/") && response.request().method() !== "GET" && response.ok()
+    );
 
     await approveButton.click();
 
     await approvalResponsePromise;
 
-    await expect(
-      productCard.getByText(/approved/i)
-    ).toBeVisible();
+    await expect(productCard.getByText(/approved/i)).toBeVisible();
   });
 
-  test("approved product becomes visible in public catalog", async ({
-    browser,
-  }) => {
-    const publicContext =
-      await browser.newContext();
+  test("approved product becomes visible in public catalog", async ({ browser }) => {
+    const publicContext = await browser.newContext();
 
-    const publicPage =
-      await publicContext.newPage();
+    const publicPage = await publicContext.newPage();
 
     try {
       await publicPage.goto("/products");
 
-      await publicPage.waitForLoadState(
-        "networkidle"
-      );
+      await publicPage.waitForLoadState("networkidle");
 
-      const searchInput =
-        publicPage.getByPlaceholder(
-          "Search products or brands..."
-        );
+      const searchInput = publicPage.getByPlaceholder("Search products or brands...");
 
-      if (
-        await searchInput
-          .isVisible()
-          .catch(() => false)
-      ) {
+      if (await searchInput.isVisible().catch(() => false)) {
         await searchInput.fill(productName);
       }
 
       await expect(
-        publicPage.getByText(productName, {
-          exact: true,
-        }).first()
+        publicPage
+          .getByText(productName, {
+            exact: true,
+          })
+          .first()
       ).toBeVisible({
         timeout: 10_000,
       });
@@ -371,17 +316,14 @@ test.describe.serial("Admin product moderation mutation flow", () => {
       })
       .click();
 
-    const dialog =
-      vendorPage.getByRole("dialog");
+    const dialog = vendorPage.getByRole("dialog");
 
     await expect(dialog).toBeVisible();
 
-    const deleteResponsePromise =
-      vendorPage.waitForResponse(
-        (response) =>
-          response.url().includes("/api/products/") &&
-          response.request().method() === "DELETE"
-      );
+    const deleteResponsePromise = vendorPage.waitForResponse(
+      (response) =>
+        response.url().includes("/api/products/") && response.request().method() === "DELETE"
+    );
 
     await dialog
       .getByRole("button", {
@@ -390,12 +332,10 @@ test.describe.serial("Admin product moderation mutation flow", () => {
       })
       .click();
 
-    const deleteResponse =
-      await deleteResponsePromise;
+    const deleteResponse = await deleteResponsePromise;
 
     if (!deleteResponse.ok()) {
-      const body =
-        await deleteResponse.text();
+      const body = await deleteResponse.text();
 
       throw new Error(
         `Cleanup deletion failed: ${deleteResponse.status()} ${deleteResponse.statusText()}\n${body}`

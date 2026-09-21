@@ -1,8 +1,15 @@
 import { validate } from "../middleware/validate.js";
-import { productSchema } from "../validators/marketplaceValidator.js";import express from "express";
+import { productSchema } from "../validators/marketplaceValidator.js";
+import express from "express";
 import {
-  createProduct, getProducts, getProductById, getMyProducts, updateProduct, deleteProduct,
-  getProductsForAdmin, moderateProduct,
+  createProduct,
+  getProducts,
+  getProductById,
+  getMyProducts,
+  updateProduct,
+  deleteProduct,
+  getProductsForAdmin,
+  moderateProduct,
 } from "../controllers/productController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";

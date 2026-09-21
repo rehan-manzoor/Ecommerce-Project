@@ -33,14 +33,11 @@ const reserveInventory = async (items) => {
         filter.stock = { $gte: item.quantity };
       }
 
-      const result = await Product.updateOne(
-        filter,
-        {
-          $inc: {
-            [field]: -item.quantity,
-          },
-        }
-      );
+      const result = await Product.updateOne(filter, {
+        $inc: {
+          [field]: -item.quantity,
+        },
+      });
 
       if (!result.modifiedCount) {
         throw new Error(`Not enough stock for ${item.product.name}`);
@@ -66,15 +63,11 @@ const restoreInventory = async (items) => {
       Product.updateOne(
         {
           _id: item.product,
-          ...(item.variantId
-            ? { "variants._id": item.variantId }
-            : {}),
+          ...(item.variantId ? { "variants._id": item.variantId } : {}),
         },
         {
           $inc: {
-            [item.variantId
-              ? "variants.$.stock"
-              : "stock"]: item.quantity,
+            [item.variantId ? "variants.$.stock" : "stock"]: item.quantity,
           },
         }
       )
@@ -107,39 +100,21 @@ export const finalizePaidOrder = async (payment) => {
     _id: { $in: productIds },
   });
 
-  const productMap = new Map(
-    products.map((product) => [
-      String(product._id),
-      product,
-    ])
-  );
+  const productMap = new Map(products.map((product) => [String(product._id), product]));
 
   const itemsNow = snapshot.map((entry) => {
-    const product = productMap.get(
-      String(entry.product)
-    );
+    const product = productMap.get(String(entry.product));
 
-    if (
-      !product ||
-      product.status !== "active" ||
-      product.approvalStatus !== "approved"
-    ) {
-      throw new Error(
-        "A product is no longer available"
-      );
+    if (!product || product.status !== "active" || product.approvalStatus !== "approved") {
+      throw new Error("A product is no longer available");
     }
 
-    const choice = selectedVariant(
-      product,
-      entry.variantId
-    );
+    const choice = selectedVariant(product, entry.variantId);
 
     return {
       product,
-      variantId:
-        choice.variant?._id || null,
-      variantAttributes:
-        choice.variant?.attributes || {},
+      variantId: choice.variant?._id || null,
+      variantAttributes: choice.variant?.attributes || {},
       quantity: entry.quantity,
       price: entry.price,
     };
@@ -149,42 +124,35 @@ export const finalizePaidOrder = async (payment) => {
   let couponReserved = false;
 
   try {
-    reserved =
-      await reserveInventory(itemsNow);
+    reserved = await reserveInventory(itemsNow);
 
     if (payment.couponCode) {
-      const coupon =
-        await Coupon.findOneAndUpdate(
-          {
-            code: payment.couponCode,
-            active: true,
-            expiresAt: { $gte: new Date() },
-            $or: [
-              { usageLimit: null },
-              {
-                $expr: {
-                  $lt: [
-                    "$usedCount",
-                    "$usageLimit",
-                  ],
-                },
+      const coupon = await Coupon.findOneAndUpdate(
+        {
+          code: payment.couponCode,
+          active: true,
+          expiresAt: { $gte: new Date() },
+          $or: [
+            { usageLimit: null },
+            {
+              $expr: {
+                $lt: ["$usedCount", "$usageLimit"],
               },
-            ],
-          },
-          {
-            $inc: {
-              usedCount: 1,
             },
+          ],
+        },
+        {
+          $inc: {
+            usedCount: 1,
           },
-          {
-            new: true,
-          }
-        );
+        },
+        {
+          new: true,
+        }
+      );
 
       if (!coupon) {
-        throw new Error(
-          "Coupon usage limit reached after payment"
-        );
+        throw new Error("Coupon usage limit reached after payment");
       }
 
       couponReserved = true;
@@ -194,11 +162,9 @@ export const finalizePaidOrder = async (payment) => {
       product: entry.product._id,
       vendor: entry.product.vendor,
       variantId: entry.variantId,
-      variantAttributes:
-        entry.variantAttributes,
+      variantAttributes: entry.variantAttributes,
       name: entry.product.name,
-      image:
-        entry.product.images?.[0] || "",
+      image: entry.product.images?.[0] || "",
       quantity: entry.quantity,
       price: entry.price,
     }));
@@ -227,10 +193,7 @@ export const finalizePaidOrder = async (payment) => {
 
       group.items.push(item);
 
-      group.subtotal = money(
-        group.subtotal +
-          item.price * item.quantity
-      );
+      group.subtotal = money(group.subtotal + item.price * item.quantity);
     }
 
     const order = await Order.create({
@@ -238,15 +201,11 @@ export const finalizePaidOrder = async (payment) => {
       payment: payment._id,
       items,
       vendorOrders: [...groups.values()],
-      subtotalAmount:
-        payment.subtotalAmount,
-      discountAmount:
-        payment.discountAmount,
-      shippingAmount:
-        payment.shippingAmount,
+      subtotalAmount: payment.subtotalAmount,
+      discountAmount: payment.discountAmount,
+      shippingAmount: payment.shippingAmount,
       taxAmount: payment.taxAmount,
-      shippingMethod:
-        payment.shippingMethod,
+      shippingMethod: payment.shippingMethod,
       totalAmount: payment.totalAmount,
       couponCode: payment.couponCode,
       status: "paid",
@@ -257,8 +216,7 @@ export const finalizePaidOrder = async (payment) => {
           note: "Stripe payment verified",
         },
       ],
-      shippingAddress:
-        payment.shippingAddress,
+      shippingAddress: payment.shippingAddress,
     });
 
     reserved = [];
@@ -286,21 +244,14 @@ export const finalizePaidOrder = async (payment) => {
       user: payment.user,
       type: "order",
       title: "Order placed",
-      message: `Order #${String(
-        order._id
-      ).slice(-8)} is confirmed`,
+      message: `Order #${String(order._id).slice(-8)} is confirmed`,
       link: "/orders",
     }).catch(() => {});
 
-    const user = await User.findById(
-      payment.user
-    );
+    const user = await User.findById(payment.user);
 
     if (user) {
-      sendOrderConfirmationEmail(
-        user,
-        order
-      ).catch(() => {});
+      sendOrderConfirmationEmail(user, order).catch(() => {});
     }
 
     return order;
@@ -322,11 +273,7 @@ export const finalizePaidOrder = async (payment) => {
       );
     }
 
-    if (
-      /stock|coupon|available/i.test(
-        String(error.message || "")
-      )
-    ) {
+    if (/stock|coupon|available/i.test(String(error.message || ""))) {
       try {
         await refundPayment(
           payment,
@@ -334,18 +281,14 @@ export const finalizePaidOrder = async (payment) => {
           "Unable to finalize order after payment"
         );
       } catch (refundError) {
-        console.error(
-          "Automatic order refund failed:",
-          refundError
-        );
+        console.error("Automatic order refund failed:", refundError);
       }
     }
 
     if (error.code === 11000) {
-      const existing =
-        await Order.findOne({
-          payment: payment._id,
-        });
+      const existing = await Order.findOne({
+        payment: payment._id,
+      });
 
       if (existing) {
         return existing;

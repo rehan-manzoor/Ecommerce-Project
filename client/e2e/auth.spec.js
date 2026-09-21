@@ -9,9 +9,7 @@ test.describe.serial("Authenticated customer flow", () => {
     const password = process.env.E2E_CUSTOMER_PASSWORD;
 
     if (!email || !password) {
-      throw new Error(
-        "E2E_CUSTOMER_EMAIL and E2E_CUSTOMER_PASSWORD must be set."
-      );
+      throw new Error("E2E_CUSTOMER_EMAIL and E2E_CUSTOMER_PASSWORD must be set.");
     }
 
     context = await browser.newContext();
@@ -24,8 +22,7 @@ test.describe.serial("Authenticated customer flow", () => {
 
     const loginResponsePromise = page.waitForResponse(
       (response) =>
-        response.url().includes("/api/users/login") &&
-        response.request().method() === "POST"
+        response.url().includes("/api/users/login") && response.request().method() === "POST"
     );
 
     await page.getByRole("button", { name: "Sign in" }).click();
@@ -43,10 +40,12 @@ test.describe.serial("Authenticated customer flow", () => {
     await expect(page).not.toHaveURL(/\/login$/);
 
     await expect(
-      page.getByRole("link", {
-        name: "My Orders",
-        exact: true,
-      }).first()
+      page
+        .getByRole("link", {
+          name: "My Orders",
+          exact: true,
+        })
+        .first()
     ).toBeVisible();
   });
 
@@ -58,24 +57,30 @@ test.describe.serial("Authenticated customer flow", () => {
     await page.goto("/");
 
     await expect(
-      page.getByRole("link", {
-        name: "My Orders",
-        exact: true,
-      }).first()
+      page
+        .getByRole("link", {
+          name: "My Orders",
+          exact: true,
+        })
+        .first()
     ).toBeVisible();
 
     await expect(
-      page.getByRole("link", {
-        name: "Wishlist",
-        exact: true,
-      }).first()
+      page
+        .getByRole("link", {
+          name: "Wishlist",
+          exact: true,
+        })
+        .first()
     ).toBeVisible();
 
     await expect(
-      page.getByRole("link", {
-        name: "My Account",
-        exact: true,
-      }).first()
+      page
+        .getByRole("link", {
+          name: "My Account",
+          exact: true,
+        })
+        .first()
     ).toBeVisible();
   });
 
@@ -85,10 +90,12 @@ test.describe.serial("Authenticated customer flow", () => {
     await page.reload();
 
     await expect(
-      page.getByRole("link", {
-        name: "My Orders",
-        exact: true,
-      }).first()
+      page
+        .getByRole("link", {
+          name: "My Orders",
+          exact: true,
+        })
+        .first()
     ).toBeVisible();
   });
 
@@ -116,18 +123,16 @@ test.describe.serial("Authenticated customer flow", () => {
   });
 
   test("customer can log out", async () => {
-  await page.goto("/");
+    await page.goto("/");
 
-  await page.getByRole("button", { name: "Logout" }).click();
+    await page.getByRole("button", { name: "Logout" }).click();
 
-  await expect(page).toHaveURL("http://localhost:5173/");
+    await expect(page).toHaveURL("http://localhost:5173/");
 
-  await expect(
-    page.getByRole("button", { name: "Logout" })
-  ).not.toBeVisible();
+    await expect(page.getByRole("button", { name: "Logout" })).not.toBeVisible();
 
-  await page.goto("/orders");
+    await page.goto("/orders");
 
-  await expect(page).toHaveURL(/\/login$/);
-});
+    await expect(page).toHaveURL(/\/login$/);
+  });
 });

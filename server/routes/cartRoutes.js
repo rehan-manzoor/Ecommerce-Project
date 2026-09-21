@@ -1,6 +1,13 @@
 import { validate } from "../middleware/validate.js";
-import { cartSchema } from "../validators/marketplaceValidator.js";import express from "express";
-import { getCart, addToCart, updateCart, removeFromCart, clearCart } from "../controllers/cartController.js";
+import { cartSchema } from "../validators/marketplaceValidator.js";
+import express from "express";
+import {
+  getCart,
+  addToCart,
+  updateCart,
+  removeFromCart,
+  clearCart,
+} from "../controllers/cartController.js";
 import { protect } from "../middleware/authMiddleware.js";
 const router = express.Router();
 router.get("/", protect, getCart);

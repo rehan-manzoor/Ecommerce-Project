@@ -3,96 +3,59 @@ import api from "../../api/axios";
 import { notify } from "../Toast";
 import { uploadImage } from "./shared.js";
 
-export function StoreTab({
-  profile,
-  setProfile,
-  onChanged,
-}) {
-  const [uploading, setUploading] =
-    useState(false);
+export function StoreTab({ profile, setProfile, onChanged }) {
+  const [uploading, setUploading] = useState(false);
 
-  const [saving, setSaving] =
-    useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const uploadStoreImage =
-    async (event, field) => {
-      const file =
-        event.target.files?.[0];
+  const uploadStoreImage = async (event, field) => {
+    const file = event.target.files?.[0];
 
-      if (!file) return;
+    if (!file) return;
 
-      try {
-        setUploading(true);
+    try {
+      setUploading(true);
 
-        const url =
-          await uploadImage(file);
+      const url = await uploadImage(file);
 
-        setProfile(
-          (current) => ({
-            ...current,
-            [field]: url,
-          })
-        );
+      setProfile((current) => ({
+        ...current,
+        [field]: url,
+      }));
 
-        notify(
-          `${
-            field === "logo"
-              ? "Logo"
-              : "Banner"
-          } uploaded`
-        );
-      } catch (error) {
-        notify(
-          error.response?.data
-            ?.message ||
-            "Upload failed",
-          "error"
-        );
-      } finally {
-        setUploading(false);
-      }
-    };
+      notify(`${field === "logo" ? "Logo" : "Banner"} uploaded`);
+    } catch (error) {
+      notify(error.response?.data?.message || "Upload failed", "error");
+    } finally {
+      setUploading(false);
+    }
+  };
 
-  const saveProfile =
-    async (event) => {
-      event.preventDefault();
+  const saveProfile = async (event) => {
+    event.preventDefault();
 
-      setSaving(true);
+    setSaving(true);
 
-      try {
-        await api.put(
-          "/vendors/me",
-          {
-            storeName:
-              profile.storeName,
+    try {
+      await api.put("/vendors/me", {
+        storeName: profile.storeName,
 
-            description:
-              profile.description,
+        description: profile.description,
 
-            logo:
-              profile.logo,
+        logo: profile.logo,
 
-            bannerImage:
-              profile.bannerImage,
-          }
-        );
+        bannerImage: profile.bannerImage,
+      });
 
-        notify(
-          "Store profile updated"
-        );
+      notify("Store profile updated");
 
-        await onChanged();
-      } catch (error) {
-        notify(
-          error.response?.data
-            ?.message ||
-            "Store update failed",
-          "error"
-        );
-      } finally {
-        setSaving(false);
-      }
-    };
+      await onChanged();
+    } catch (error) {
+      notify(error.response?.data?.message || "Store update failed", "error");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <>
@@ -100,23 +63,15 @@ export function StoreTab({
         <h1>Store settings</h1>
       </div>
 
-      <form
-        className="panel"
-        onSubmit={saveProfile}
-      >
+      <form className="panel" onSubmit={saveProfile}>
         <label>
           Store name
-
           <input
-            value={
-              profile.storeName
-            }
+            value={profile.storeName}
             onChange={(event) =>
               setProfile({
                 ...profile,
-                storeName:
-                  event.target
-                    .value,
+                storeName: event.target.value,
               })
             }
           />
@@ -124,18 +79,12 @@ export function StoreTab({
 
         <label>
           Description
-
           <textarea
-            value={
-              profile.description ||
-              ""
-            }
+            value={profile.description || ""}
             onChange={(event) =>
               setProfile({
                 ...profile,
-                description:
-                  event.target
-                    .value,
+                description: event.target.value,
               })
             }
           />
@@ -143,17 +92,12 @@ export function StoreTab({
 
         <label>
           Logo URL
-
           <input
-            value={
-              profile.logo || ""
-            }
+            value={profile.logo || ""}
             onChange={(event) =>
               setProfile({
                 ...profile,
-                logo:
-                  event.target
-                    .value,
+                logo: event.target.value,
               })
             }
           />
@@ -161,41 +105,25 @@ export function StoreTab({
 
         <label>
           Upload logo
-
           <input
             type="file"
             accept="image/*"
-            onChange={(event) =>
-              uploadStoreImage(
-                event,
-                "logo"
-              )
-            }
+            onChange={(event) => uploadStoreImage(event, "logo")}
           />
         </label>
 
         {profile.logo && (
-          <img
-            className="settings-image-preview"
-            src={profile.logo}
-            alt="Store logo"
-          />
+          <img className="settings-image-preview" src={profile.logo} alt="Store logo" />
         )}
 
         <label>
           Banner URL
-
           <input
-            value={
-              profile.bannerImage ||
-              ""
-            }
+            value={profile.bannerImage || ""}
             onChange={(event) =>
               setProfile({
                 ...profile,
-                bannerImage:
-                  event.target
-                    .value,
+                bannerImage: event.target.value,
               })
             }
           />
@@ -203,38 +131,19 @@ export function StoreTab({
 
         <label>
           Upload banner
-
           <input
             type="file"
             accept="image/*"
-            onChange={(event) =>
-              uploadStoreImage(
-                event,
-                "bannerImage"
-              )
-            }
+            onChange={(event) => uploadStoreImage(event, "bannerImage")}
           />
         </label>
 
         {profile.bannerImage && (
-          <img
-            className="settings-banner-preview"
-            src={
-              profile.bannerImage
-            }
-            alt="Store banner"
-          />
+          <img className="settings-banner-preview" src={profile.bannerImage} alt="Store banner" />
         )}
 
-        <button
-          className="button"
-          disabled={
-            uploading || saving
-          }
-        >
-          {saving
-            ? "Saving..."
-            : "Save store settings"}
+        <button className="button" disabled={uploading || saving}>
+          {saving ? "Saving..." : "Save store settings"}
         </button>
       </form>
     </>

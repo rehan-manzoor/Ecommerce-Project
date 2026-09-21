@@ -12,8 +12,8 @@ export default function Footer() {
             <span>MERN Market</span>
           </div>
           <p>
-            A complete multi-vendor marketplace: verified sellers, admin-moderated listings,
-            secure Stripe checkout and real customer reviews.
+            A complete multi-vendor marketplace: verified sellers, admin-moderated listings, secure
+            Stripe checkout and real customer reviews.
           </p>
         </div>
 
@@ -32,7 +32,9 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="footer-bottom">© {year} MERN Market. Built with MongoDB, Express, React &amp; Node.</div>
+      <div className="footer-bottom">
+        © {year} MERN Market. Built with MongoDB, Express, React &amp; Node.
+      </div>
     </footer>
   );
 }

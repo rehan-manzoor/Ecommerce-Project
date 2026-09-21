@@ -24,17 +24,33 @@ export default function HomePage() {
           <div>
             <span className="eyebrow">Multi-vendor marketplace</span>
             <h1>Everything you need, from sellers you can trust.</h1>
-            <p>Discover approved products, secure Stripe checkout, verified reviews and independent stores in one modern marketplace.</p>
+            <p>
+              Discover approved products, secure Stripe checkout, verified reviews and independent
+              stores in one modern marketplace.
+            </p>
             <div className="hero-actions">
-              <Link className="button" to="/products">Shop now</Link>
-              <Link className="button ghost" to="/become-vendor">Start selling</Link>
+              <Link className="button" to="/products">
+                Shop now
+              </Link>
+              <Link className="button ghost" to="/become-vendor">
+                Start selling
+              </Link>
             </div>
           </div>
 
           <div className="hero-card">
-            <div className="metric"><strong>Secure</strong><span>Stripe payments</span></div>
-            <div className="metric"><strong>Verified</strong><span>Purchase reviews</span></div>
-            <div className="metric"><strong>Curated</strong><span>Admin-approved listings</span></div>
+            <div className="metric">
+              <strong>Secure</strong>
+              <span>Stripe payments</span>
+            </div>
+            <div className="metric">
+              <strong>Verified</strong>
+              <span>Purchase reviews</span>
+            </div>
+            <div className="metric">
+              <strong>Curated</strong>
+              <span>Admin-approved listings</span>
+            </div>
           </div>
         </div>
       </section>
@@ -51,13 +67,19 @@ export default function HomePage() {
         {loading ? (
           <div className="category-grid">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div className="category-card" key={i}><div className="skeleton" style={{ height: 42, width: 42 }} /></div>
+              <div className="category-card" key={i}>
+                <div className="skeleton" style={{ height: 42, width: 42 }} />
+              </div>
             ))}
           </div>
         ) : categories.length ? (
           <div className="category-grid">
             {categories.slice(0, 6).map((category) => (
-              <Link className="category-card" key={category._id} to={`/products?category=${category._id}`}>
+              <Link
+                className="category-card"
+                key={category._id}
+                to={`/products?category=${category._id}`}
+              >
                 <span>✦</span>
                 <div>
                   <h3>{category.name}</h3>
@@ -85,7 +107,10 @@ export default function HomePage() {
               <div className="product-card" key={i}>
                 <div className="skeleton product-image" />
                 <div className="product-info">
-                  <div className="skeleton" style={{ height: 18, width: "80%", marginBottom: 10 }} />
+                  <div
+                    className="skeleton"
+                    style={{ height: 18, width: "80%", marginBottom: 10 }}
+                  />
                   <div className="skeleton" style={{ height: 14, width: "40%" }} />
                 </div>
               </div>
@@ -96,7 +121,11 @@ export default function HomePage() {
             {products.map((product) => (
               <Link className="product-card" key={product._id} to={`/products/${product._id}`}>
                 <div className="product-image">
-                  {product.images?.[0] ? <img src={product.images[0]} alt={product.name} /> : <span>No image</span>}
+                  {product.images?.[0] ? (
+                    <img src={product.images[0]} alt={product.name} />
+                  ) : (
+                    <span>No image</span>
+                  )}
                 </div>
                 <div className="product-info">
                   <span className="muted small-text">{product.category?.name || "Product"}</span>

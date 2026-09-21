@@ -13,6 +13,10 @@ if (!email || !password || password.length < 6) {
 }
 await connectDB();
 const hashed = await bcrypt.hash(password, 10);
-const user = await User.findOneAndUpdate({ email: email.toLowerCase() }, { name, email: email.toLowerCase(), password: hashed, role: "admin", isBlocked: false }, { upsert: true, new: true, setDefaultsOnInsert: true });
+const user = await User.findOneAndUpdate(
+  { email: email.toLowerCase() },
+  { name, email: email.toLowerCase(), password: hashed, role: "admin", isBlocked: false },
+  { upsert: true, new: true, setDefaultsOnInsert: true }
+);
 console.log(`Admin ready: ${user.email}`);
 await mongoose.disconnect();

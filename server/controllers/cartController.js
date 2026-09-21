@@ -14,9 +14,7 @@ const populatedCart = (query) =>
 
 export const getCart = async (req, res, next) => {
   try {
-    const cart = await populatedCart(
-      Cart.findOne({ user: req.user.userId })
-    );
+    const cart = await populatedCart(Cart.findOne({ user: req.user.userId }));
 
     res.json({
       success: true,
@@ -174,9 +172,7 @@ export const updateCart = async (req, res, next) => {
 
     await cart.save();
 
-    const fresh = await populatedCart(
-      Cart.findById(cart._id)
-    );
+    const fresh = await populatedCart(Cart.findById(cart._id));
 
     res.json({
       success: true,
@@ -208,16 +204,13 @@ export const removeFromCart = async (req, res, next) => {
       (item) =>
         !(
           item.product.toString() === req.params.productId &&
-          String(item.variantId || "") ===
-            String(req.query.variantId || "")
+          String(item.variantId || "") === String(req.query.variantId || "")
         )
     );
 
     await cart.save();
 
-    const fresh = await populatedCart(
-      Cart.findById(cart._id)
-    );
+    const fresh = await populatedCart(Cart.findById(cart._id));
 
     res.json({
       success: true,

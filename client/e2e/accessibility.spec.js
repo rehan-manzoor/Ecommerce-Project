@@ -7,18 +7,14 @@ async function checkAccessibility(page, name) {
     .analyze();
 
   const seriousViolations = results.violations.filter(
-    (violation) =>
-      violation.impact === "serious" ||
-      violation.impact === "critical"
+    (violation) => violation.impact === "serious" || violation.impact === "critical"
   );
 
   if (seriousViolations.length > 0) {
     console.log(`\nAccessibility problems on ${name}:`);
 
     for (const violation of seriousViolations) {
-      console.log(
-        `\n[${violation.impact}] ${violation.id}: ${violation.help}`
-      );
+      console.log(`\n[${violation.impact}] ${violation.id}: ${violation.help}`);
 
       for (const node of violation.nodes) {
         console.log(`  Target: ${node.target.join(" ")}`);
@@ -34,45 +30,35 @@ async function checkAccessibility(page, name) {
 }
 
 test.describe("Accessibility", () => {
-  test("home page has no serious accessibility violations", async ({
-    page,
-  }) => {
+  test("home page has no serious accessibility violations", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
     await checkAccessibility(page, "Home page");
   });
 
-  test("login page has no serious accessibility violations", async ({
-    page,
-  }) => {
+  test("login page has no serious accessibility violations", async ({ page }) => {
     await page.goto("/login");
     await page.waitForLoadState("networkidle");
 
     await checkAccessibility(page, "Login page");
   });
 
-  test("register page has no serious accessibility violations", async ({
-    page,
-  }) => {
+  test("register page has no serious accessibility violations", async ({ page }) => {
     await page.goto("/register");
     await page.waitForLoadState("networkidle");
 
     await checkAccessibility(page, "Register page");
   });
 
-  test("products page has no serious accessibility violations", async ({
-    page,
-  }) => {
+  test("products page has no serious accessibility violations", async ({ page }) => {
     await page.goto("/products");
     await page.waitForLoadState("networkidle");
 
     await checkAccessibility(page, "Products page");
   });
 
-  test("cart page has no serious accessibility violations", async ({
-    page,
-  }) => {
+  test("cart page has no serious accessibility violations", async ({ page }) => {
     await page.goto("/cart");
     await page.waitForLoadState("networkidle");
 

@@ -5,17 +5,13 @@ test.describe("MERN Market smoke tests", () => {
     await page.goto("/");
 
     await expect(page).toHaveTitle(/MERN/i);
-    await expect(
-    page.getByRole("link", { name: /MERN Market/i })
-    ).toBeVisible();
+    await expect(page.getByRole("link", { name: /MERN Market/i })).toBeVisible();
   });
 
   test("login page opens", async ({ page }) => {
     await page.goto("/login");
 
-    await expect(
-      page.getByRole("heading", { name: "Sign in" })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 
     await expect(page.getByLabel("Email")).toBeVisible();
     await expect(page.getByLabel("Password")).toBeVisible();
@@ -24,9 +20,7 @@ test.describe("MERN Market smoke tests", () => {
   test("register page opens", async ({ page }) => {
     await page.goto("/register");
 
-    await expect(
-      page.getByRole("heading", { name: "Create account" })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Create account" })).toBeVisible();
 
     await expect(page.getByLabel("Name")).toBeVisible();
     await expect(page.getByLabel("Email")).toBeVisible();
@@ -36,13 +30,9 @@ test.describe("MERN Market smoke tests", () => {
   test("products page opens", async ({ page }) => {
     await page.goto("/products");
 
-    await expect(
-      page.getByRole("heading", { name: "Shop products" })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Shop products" })).toBeVisible();
 
-    await expect(
-      page.getByPlaceholder("Search products or brands...")
-    ).toBeVisible();
+    await expect(page.getByPlaceholder("Search products or brands...")).toBeVisible();
   });
 
   test("guest cannot open protected checkout", async ({ page }) => {
@@ -50,9 +40,7 @@ test.describe("MERN Market smoke tests", () => {
 
     await expect(page).toHaveURL(/\/login$/);
 
-    await expect(
-      page.getByRole("heading", { name: "Sign in" })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
   });
 
   test("guest cannot open orders", async ({ page }) => {

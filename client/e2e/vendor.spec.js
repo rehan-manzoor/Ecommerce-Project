@@ -24,8 +24,7 @@ test.describe.serial("Vendor dashboard", () => {
 
     const responsePromise = page.waitForResponse(
       (response) =>
-        response.url().includes("/api/users/login") &&
-        response.request().method() === "POST"
+        response.url().includes("/api/users/login") && response.request().method() === "POST"
     );
 
     await page.getByRole("button", { name: "Sign in" }).click();
@@ -35,11 +34,11 @@ test.describe.serial("Vendor dashboard", () => {
     if (!response.ok()) {
       let body;
 
-try {
-  body = await response.text();
-} catch {
-  body = "Unable to read response body";
-}
+      try {
+        body = await response.text();
+      } catch {
+        body = "Unable to read response body";
+      }
 
       throw new Error(
         `Vendor login failed: ${response.status()} ${response.statusText()}\n${body}`
@@ -113,9 +112,11 @@ try {
       .click();
 
     await expect(
-      page.getByRole("heading", {
-        name: /orders/i,
-      }).first()
+      page
+        .getByRole("heading", {
+          name: /orders/i,
+        })
+        .first()
     ).toBeVisible();
   });
 
