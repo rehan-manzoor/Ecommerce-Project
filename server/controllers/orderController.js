@@ -7,6 +7,7 @@ import Product from '../models/Product.js';
 import Coupon from '../models/Coupon.js';
 import Vendor from '../models/Vendor.js';
 import User from '../models/User.js';
+import { finalizePaidOrder } from "../services/orderFinalizationService.js";
 import Notification from '../models/Notification.js';
 import { selectedVariant, money } from '../services/catalogService.js';
 import { refundPayment } from '../services/refundService.js';
@@ -44,106 +45,63 @@ const aggregateStatus = (order) => {
   return 'paid';
 };
 export const createOrder = async (req, res) => {
-  let reserved = [];
-  let created = false;
-  let couponReserved = false;
   try {
     const { paymentIntentId } = req.body;
-    if (typeof paymentIntentId !== 'string') return fail(res, 400, 'Payment Intent ID is required');
-    const shippingAddress = safeAddress(req.body.shippingAddress);
-    const payment = await Payment.findOne({ stripePaymentIntentId: paymentIntentId, user: req.user.userId });
-    if (!payment) return fail(res, 404, 'Payment not found');
-    const existing = await Order.findOne({ payment: payment._id }).populate(populate);
-    if (existing) return res.json({ success: true, data: existing, message: 'Order already created' });
-    if (payment.status === 'refunded') return fail(res, 409, 'Payment was refunded');
-    const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
-    if (intent.status !== 'succeeded' || intent.amount !== payment.amount || intent.currency !== payment.currency) return fail(res, 400, 'Payment has not been verified');
-    if (payment.status !== 'succeeded') { payment.status = 'succeeded'; await payment.save(); }
-    const cart = await Cart.findOne({ user: req.user.userId }).populate('items.product');
-    if (!cart?.items.length) {
-  await refundPayment(
-    payment,
-    payment.amount / 100,
-    "Cart empty before order creation"
-  );
 
-  return fail(
-    res,
-    409,
-    "Cart is empty after payment; a full refund was initiated"
-  );
-}
-    const snapshot = payment.cartSnapshot || [];
-    const itemsNow = cart.items.map((entry) => {
-      const choice = selectedVariant(entry.product, entry.variantId);
-      return { product: entry.product, variantId: choice.variant?._id || null, variantAttributes: choice.variant?.attributes || {}, quantity: entry.quantity, price: choice.price };
+    const payment = await Payment.findOne({
+      stripePaymentIntentId: paymentIntentId,
+      user: req.user.userId,
     });
-    const key = (item) => `${item.product._id || item.product}:${item.variantId || ''}:${item.quantity}:${item.price}`;
-    if (snapshot.length !== itemsNow.length || snapshot.map(key).sort().join('|') !== itemsNow.map(key).sort().join('|')) {
-      await refundPayment(payment, payment.amount / 100, 'Cart changed before order creation');
-      return fail(res, 409, 'Cart changed after payment; a full refund was initiated');
+
+    if (!payment) {
+      return fail(
+        res,
+        404,
+        "Payment not found"
+      );
     }
-    reserved = await reserve(itemsNow);
-    if (payment.couponCode) {
-      const coupon = await Coupon.findOneAndUpdate({ code: payment.couponCode, active: true, expiresAt: { $gte: new Date() }, $or: [{ usageLimit: null }, { $expr: { $lt: ['$usedCount', '$usageLimit'] } }] }, { $inc: { usedCount: 1 } }, { new: true });
-      if (!coupon) throw new Error('Coupon usage limit reached after payment');
-      couponReserved = true;
+
+    const intent =
+      await stripe.paymentIntents.retrieve(
+        paymentIntentId
+      );
+
+    if (
+      intent.status !== "succeeded" ||
+      intent.amount !== payment.amount ||
+      intent.currency !== payment.currency
+    ) {
+      return fail(
+        res,
+        400,
+        "Payment has not been verified"
+      );
     }
-    const items = itemsNow.map((entry) => ({ product: entry.product._id, vendor: entry.product.vendor, variantId: entry.variantId, variantAttributes: entry.variantAttributes, name: entry.product.name, image: entry.product.images?.[0] || '', quantity: entry.quantity, price: entry.price }));
-    const groups = new Map();
-    for (const item of items) {
-      const vendor = String(item.vendor);
-      if (!groups.has(vendor)) groups.set(vendor, { vendor: item.vendor, items: [], subtotal: 0, status: 'confirmed', history: [{ status: 'confirmed', changedAt: new Date() }] });
-      const group = groups.get(vendor); group.items.push(item); group.subtotal = money(group.subtotal + item.price * item.quantity);
-    }
-    const order = await Order.create({ user: req.user.userId, payment: payment._id, items, vendorOrders: [...groups.values()], subtotalAmount: payment.subtotalAmount, discountAmount: payment.discountAmount, shippingAmount: payment.shippingAmount, taxAmount: payment.taxAmount, shippingMethod: payment.shippingMethod, totalAmount: payment.totalAmount, couponCode: payment.couponCode, status: 'paid', paymentStatus: 'paid', statusHistory: [{ status: 'paid', note: 'Stripe payment verified' }], shippingAddress });
-    created = true; reserved = [];
-    const operations = [Payment.updateOne({ _id: payment._id }, { order: order._id }), Cart.updateOne({ _id: cart._id }, { $set: { items: [] } })];
-    const housekeeping = await Promise.allSettled(operations);
-    for (const result of housekeeping) if (result.status === 'rejected') console.error('Order housekeeping failed:', result.reason);
-    const user = await User.findById(req.user.userId);
-    await notify(req.user.userId, 'order', 'Order placed', `Order #${String(order._id).slice(-8)} is confirmed`, '/orders');
-    if (user) sendOrderConfirmationEmail(user, order).catch(() => {});
-    res.status(201).json({ success: true, message: 'Order created', data: await Order.findById(order._id).populate(populate) });
+
+    payment.status = "succeeded";
+    await payment.save();
+
+    const order =
+      await finalizePaidOrder(payment);
+
+    return res.status(201).json({
+      success: true,
+      message: "Order created",
+      data: await Order.findById(
+        order._id
+      ).populate(populate),
+    });
   } catch (error) {
-    if (reserved.length && !created) await restore(reserved);
-    if (couponReserved && !created) await Coupon.updateOne({ code: (await Payment.findOne({ stripePaymentIntentId: req.body.paymentIntentId }))?.couponCode }, { $inc: { usedCount: -1 } });
-    if (!created && /stock|coupon/i.test(error.message)) {
-      const payment = await Payment.findOne({ stripePaymentIntentId: req.body.paymentIntentId, user: req.user.userId });
-      if (payment?.status === 'succeeded') {
-        try { await refundPayment(payment, payment.amount / 100, 'Insufficient stock after payment'); }
-        catch (refundError) { console.error('Stock refund failed:', refundError); }
-      }
-    }
-    if (error.code === 11000) {
-      const existing = await Order.findOne({ payment: (await Payment.findOne({ stripePaymentIntentId: req.body.paymentIntentId }))?._id }).populate(populate);
-      if (existing) return res.json({ success: true, data: existing });
-    }
-    const errorMessage = String(error.message || "");
+    console.error(
+      "Order creation failed:",
+      error
+    );
 
-if (/stock/i.test(errorMessage)) {
-  return fail(
-    res,
-    409,
-    "Insufficient stock to complete the order"
-  );
-}
-
-if (/coupon/i.test(errorMessage)) {
-  return fail(
-    res,
-    409,
-    "Coupon is no longer available"
-  );
-}
-
-console.error("Order creation failed:", error);
-
-return fail(
-  res,
-  400,
-  "Unable to create order"
-);
+    return fail(
+      res,
+      400,
+      "Unable to create order"
+    );
   }
 };
 export const getMyOrders = async (req, res) => res.json({ success: true, data: await Order.find({ user: req.user.userId }).populate(populate).sort({ createdAt: -1 }) });

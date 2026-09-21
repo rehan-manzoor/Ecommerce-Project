@@ -68,7 +68,11 @@ export default function Payment() {
   const prepare = async () => {
     try {
       setLoading(true);
-      const response = await api.post("/payments/create-intent", { couponCode, shippingMethodId });
+      const response = await api.post("/payments/create-intent", {
+  couponCode,
+  shippingMethodId,
+  shippingAddress
+});
       setClientSecret(response.data.data.clientSecret);
       setPricing(response.data.data.pricing);
       sessionStorage.setItem("checkoutPayload", JSON.stringify({ shippingAddress, couponCode, shippingMethodId }));

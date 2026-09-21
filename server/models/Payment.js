@@ -19,6 +19,13 @@ const paymentSchema = new mongoose.Schema(
     shippingAmount: { type: Number, default: 0 },
     taxAmount: { type: Number, default: 0 },
     shippingMethod: { type: mongoose.Schema.Types.ObjectId, ref: "ShippingMethod", default: null },
+    shippingAddress: {
+  address: { type: String, required: true },
+  city: { type: String, required: true },
+  state: { type: String, default: "" },
+  postalCode: { type: String, required: true },
+  country: { type: String, required: true },
+},
     cartSnapshot: { type: [{ product: mongoose.Schema.Types.ObjectId, variantId: mongoose.Schema.Types.ObjectId, quantity: Number, price: Number }], default: [] },
     refunds: [{ stripeRefundId: String, amount: Number, reason: String, status: String, createdAt: { type: Date, default: Date.now } }],
   },

@@ -1,75 +1,149 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import {
+  Link,
+  useSearchParams,
+} from "react-router";
+
 import api from "../api/axios";
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
 
-  const paymentIntentId = searchParams.get("payment_intent");
+  const paymentIntentId =
+    searchParams.get("payment_intent");
 
   const [state, setState] = useState({
     loading: true,
-    message: "Verifying payment and creating your order...",
+    message:
+      "Payment received. Confirming your order...",
     order: null,
   });
 
   useEffect(() => {
-    const controller = new AbortController();
+    let cancelled = false;
+    let timer = null;
 
-    const run = async () => {
+    const checkPayment = async (
+      attempt = 0
+    ) => {
       try {
-        const saved = JSON.parse(
-          sessionStorage.getItem("checkoutPayload") || "null"
-        );
-
-        if (!paymentIntentId || !saved?.shippingAddress) {
+        if (!paymentIntentId) {
           throw new Error(
             "Payment confirmation information is missing"
           );
         }
 
-        const response = await api.post(
-          "/orders",
-          {
-            paymentIntentId,
-            shippingAddress: saved.shippingAddress,
-          },
-          {
-            signal: controller.signal,
-          }
+        const response = await api.get(
+          `/payments/intent/${paymentIntentId}`
         );
 
-        sessionStorage.removeItem("checkoutPayload");
+        if (cancelled) return;
 
-        setState({
-          loading: false,
-          message: "Payment successful. Your order is confirmed!",
-          order: response.data.data,
-        });
-      } catch (error) {
-        // Ignore request cancelled by React StrictMode
-        if (
-          error.code === "ERR_CANCELED" ||
-          error.name === "CanceledError"
-        ) {
+        const payment =
+          response.data.data;
+
+        if (payment.order) {
+          sessionStorage.removeItem(
+            "checkoutPayload"
+          );
+
+          setState({
+            loading: false,
+            message:
+              "Payment successful. Your order is confirmed!",
+            order: payment.order,
+          });
+
+          return;
+        }
+
+        if (payment.status === "failed") {
+          setState({
+            loading: false,
+            message:
+              "Payment could not be completed.",
+            order: null,
+          });
+
+          return;
+        }
+
+        if (payment.status === "refunded") {
+          setState({
+            loading: false,
+            message:
+              "The payment was refunded because the order could not be finalized.",
+            order: null,
+          });
+
+          return;
+        }
+
+        /*
+         * Stripe webhook processing can finish a
+         * moment after the browser redirects.
+         * Poll briefly for the webhook-created order.
+         */
+        if (attempt < 12) {
+          timer = setTimeout(
+            () =>
+              checkPayment(
+                attempt + 1
+              ),
+            1000
+          );
+
           return;
         }
 
         setState({
           loading: false,
           message:
-            error.response?.data?.message ||
+            "Payment was received, but order confirmation is taking longer than expected. Please check My Orders shortly.",
+          order: null,
+        });
+      } catch (error) {
+        if (cancelled) return;
+
+        /*
+         * Give the webhook a moment if the
+         * payment record/order is still being processed.
+         */
+        if (
+          attempt < 5 &&
+          error.response?.status !== 401
+        ) {
+          timer = setTimeout(
+            () =>
+              checkPayment(
+                attempt + 1
+              ),
+            1000
+          );
+
+          return;
+        }
+
+        setState({
+          loading: false,
+          message:
+            error.response?.data
+              ?.message ||
             error.message ||
-            "Payment succeeded but the order could not be finalized.",
+            "Unable to confirm the order.",
           order: null,
         });
       }
     };
 
-    run();
+    checkPayment();
 
     return () => {
-      controller.abort();
+      cancelled = true;
+
+      if (timer) {
+        clearTimeout(timer);
+      }
     };
   }, [paymentIntentId]);
 
@@ -77,12 +151,16 @@ export default function PaymentSuccess() {
     <main className="container page-shell">
       <div className="success-card panel">
         <div className="success-icon">
-          {state.loading ? "…" : state.order ? "✓" : "!"}
+          {state.loading
+            ? "…"
+            : state.order
+            ? "✓"
+            : "!"}
         </div>
 
         <h1>
           {state.loading
-            ? "Finalizing your order"
+            ? "Confirming your order"
             : state.order
             ? "Order confirmed"
             : "Order needs attention"}
@@ -92,20 +170,33 @@ export default function PaymentSuccess() {
 
         {state.order && (
           <p className="muted">
-            Order #{state.order._id.slice(-8).toUpperCase()}
+            Order #
+            {String(
+              state.order._id
+            )
+              .slice(-8)
+              .toUpperCase()}
           </p>
         )}
 
         <div className="hero-actions">
           {state.order && (
-            <Link className="button" to="/orders">
+            <Link
+              className="button"
+              to="/orders"
+            >
               View my orders
             </Link>
           )}
 
-          <Link className="button ghost" to="/products">
-            Continue shopping
-          </Link>
+          {!state.loading && (
+            <Link
+              className="button ghost"
+              to="/products"
+            >
+              Continue shopping
+            </Link>
+          )}
         </div>
       </div>
     </main>
