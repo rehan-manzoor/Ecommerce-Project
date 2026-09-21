@@ -381,34 +381,33 @@ The backend calculates the authoritative checkout amount.
 
 ## Stripe Payments
 
-Stripe PaymentIntent integration is included.
-
-The payment flow is:
-
-```text
 Customer cart
-     ↓
+↓
 Server calculates authoritative pricing
-     ↓
-PaymentIntent created
-     ↓
+↓
+PaymentIntent + Payment record created
+↓
+Shipping address + cart snapshot stored server-side
+↓
 Customer completes Stripe payment
-     ↓
-Server verifies PaymentIntent
-     ↓
-Order is created
-```
-
-The backend verifies:
-
-- PaymentIntent status
-- Paid amount
-- Currency
-- User ownership
-- Cart snapshot
-- Current cart state
-
-Stripe currently runs in test mode for the deployed portfolio environment.
+↓
+Stripe sends payment_intent.succeeded webhook
+↓
+Server verifies and finalizes the paid order
+↓
+Inventory reserved
+↓
+Coupon usage recorded
+↓
+Order created
+↓
+Payment linked to order
+↓
+Cart cleared
+↓
+Confirmation email + notification
+↓
+Frontend polls payment status and displays confirmed order
 
 ---
 
@@ -425,6 +424,12 @@ refund.updated
 ```
 
 Webhook signatures are verified using the configured Stripe webhook secret.
+
+Processed Stripe webhook event IDs are persisted in MongoDB to prevent duplicate webhook processing.
+
+The webhook event store uses a unique Stripe event ID and a TTL so old processed-event records are automatically removed.
+
+Duplicate webhook deliveries return a successful response without repeating order/refund side effects.
 
 Production webhook endpoint:
 
@@ -463,7 +468,7 @@ Stock reduction uses atomic MongoDB update conditions.
 
 If a later reservation operation fails, previously reserved inventory is restored.
 
-The application also verifies that the cart still matches the payment snapshot before creating an order.
+The payment record stores an authoritative cart snapshot before payment. Successful payment finalization uses this server-side snapshot so order creation does not depend on the browser's current cart state after payment.
 
 ---
 
@@ -739,6 +744,38 @@ Coverage includes:
 
 ---
 
+## Continuous Integration
+
+GitHub Actions runs automated verification on every push and pull request to the `main` branch.
+
+The CI workflow contains three jobs:
+
+### Code Quality
+
+- Installs root development dependencies
+- Runs Prettier formatting verification
+
+### Backend Checks
+
+- Installs backend dependencies
+- Runs all backend tests
+- Runs dependency security audit
+
+### Frontend Checks
+
+- Installs frontend dependencies
+- Runs ESLint
+- Runs frontend unit/integration tests
+- Builds the production frontend
+- Runs dependency security audit
+
+Workflow file:
+
+````text
+.github/workflows/ci.yml
+
+---
+
 ## Code Quality
 
 Run frontend linting:
@@ -746,7 +783,7 @@ Run frontend linting:
 ```bash
 cd client
 npm run lint
-```
+````
 
 Run a production build:
 
@@ -1192,6 +1229,10 @@ Uploaded image URLs use Cloudinary-hosted URLs such as:
 https://res.cloudinary.com/...
 ```
 
+When a vendor replaces or removes a product image, the backend checks whether the image is still referenced by another product or by historical order data before deleting the Cloudinary asset.
+
+Historical order images are preserved, and soft-deleting a product does not automatically remove its Cloudinary images.
+
 This prevents uploaded files from disappearing after serverless redeployments.
 
 ---
@@ -1358,6 +1399,12 @@ Role authorization         PASS
 CSRF authentication flow   PASS
 Rate limiting              PASS
 Accessibility testing      PASS
+
+GitHub Actions CI          PASS
+Prettier formatting        PASS
+Webhook order finalization PASS
+Webhook deduplication      PASS
+Cloudinary cleanup         PASS
 ```
 
 ---
