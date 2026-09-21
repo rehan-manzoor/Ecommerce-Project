@@ -43,10 +43,24 @@ export const createPaymentIntent = async (req, res, next) => {
       error: null,
     });
   } catch (error) {
-    error.statusCode = 400;
+  error.statusCode = 400;
+
+  if (
+    error.message === "Coupon is not active" ||
+    error.message === "Coupon expired" ||
+    error.message === "Coupon not found" ||
+    error.message === "Select a shipping method" ||
+    error.message?.startsWith("Not enough stock for") ||
+    error.message === "Cart is empty" ||
+    error.message === "A product in your cart is unavailable"
+  ) {
+    error.publicMessage = error.message;
+  } else {
     error.publicMessage = "Failed to create payment intent";
-    next(error);
   }
+
+  next(error);
+}
 };
 
 export const stripeWebhook = async (req, res) => {
