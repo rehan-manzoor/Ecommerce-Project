@@ -2,7 +2,7 @@
 
 A full-stack, role-based multi-vendor e-commerce marketplace built with the MERN stack.
 
-The application supports complete customer shopping flows, vendor product and order management, administrative moderation, Stripe payment processing, refunds and returns, shipping management, secure authentication, accessibility checks, and automated testing.
+The application supports complete customer shopping flows, vendor product and order management, administrative moderation, Stripe payment processing, refunds and returns, shipping management, secure authentication, persistent cloud image uploads, email notifications, accessibility checks, automated testing, and production deployment.
 
 ---
 
@@ -54,6 +54,7 @@ Approved vendors can:
 - Configure sale pricing
 - Configure low-stock thresholds
 - Manage product availability
+- Upload product images
 - View vendor-specific orders
 - Process fulfillment
 - Add tracking information
@@ -114,6 +115,14 @@ Admin functionality includes:
 - Helmet
 - CORS
 - Express Rate Limit
+
+### Cloud Services
+
+- Vercel
+- MongoDB Atlas
+- Cloudinary
+- Stripe
+- Gmail SMTP
 
 ### Testing
 
@@ -211,6 +220,8 @@ E2E_TEST=true
 
 and the server is not running in production mode.
 
+The backend is configured to trust the deployment proxy when running behind Vercel.
+
 ---
 
 ## Product System
@@ -281,7 +292,9 @@ Inventory checks operate against the correct variant inventory.
 
 ## Product Image Uploads
 
-Image uploads are restricted to:
+Production image uploads are stored in Cloudinary.
+
+Supported formats:
 
 ```text
 JPEG
@@ -295,8 +308,12 @@ Upload security includes:
 - File extension validation
 - File-size limits
 - Actual file-signature validation
-- Random file names
 - Vendor/admin authorization
+- Cloud-hosted storage
+- Cloudinary-generated asset identifiers
+- HTTPS image delivery
+
+The application uses in-memory Multer storage before securely uploading validated files to Cloudinary.
 
 ---
 
@@ -391,19 +408,29 @@ The backend verifies:
 - Cart snapshot
 - Current cart state
 
+Stripe currently runs in test mode for the deployed portfolio environment.
+
 ---
 
 ## Stripe Webhooks
 
 Stripe webhook processing uses the original raw request body.
 
-Supported payment-related webhook handling includes:
+Supported webhook events include:
 
-- Payment succeeded
-- Payment failed
-- Refund updates
+```text
+payment_intent.succeeded
+payment_intent.payment_failed
+refund.updated
+```
 
 Webhook signatures are verified using the configured Stripe webhook secret.
+
+Production webhook endpoint:
+
+```text
+https://ecommerce-api-rehan-27b3.vercel.app/api/payments/webhook
+```
 
 ---
 
@@ -522,7 +549,7 @@ The application supports notifications for events such as:
 
 ## Email Notifications
 
-Email infrastructure uses Nodemailer.
+Email infrastructure uses Nodemailer with SMTP configuration.
 
 Supported email flows include:
 
@@ -532,7 +559,9 @@ Supported email flows include:
 - Order status updates
 - Vendor approval updates
 
-If SMTP credentials are not configured during local development, email output falls back to development logging.
+In production, email delivery is configured using SMTP credentials.
+
+For local development, if SMTP credentials are not configured, email content falls back to server console logging.
 
 ---
 
@@ -546,6 +575,8 @@ Reset tokens expire automatically.
 
 Successful password reset also invalidates existing refresh-token sessions.
 
+Production reset links point to the deployed frontend application.
+
 ---
 
 ## Security Features
@@ -557,6 +588,7 @@ Security measures include:
 - Password hashing
 - JWT authentication
 - HttpOnly refresh-token cookies
+- Secure production cookies
 - Refresh-token hashing
 - Refresh-token rotation
 - Role-based authorization
@@ -565,12 +597,15 @@ Security measures include:
 - Payment rate limiting
 - Zod request validation
 - Upload validation
+- Cloud-hosted media storage
 - Centralized error handling
 - Generic public server errors
 - Stripe webhook verification
 - Server-side pricing
 - Server-side authorization
 - Inventory validation
+- Reverse-proxy trust configuration
+- Environment-based secrets
 
 ---
 
@@ -760,11 +795,15 @@ Ecommerce-Project/
 │   │
 │   ├── eslint.config.js
 │   ├── playwright.config.js
+│   ├── vercel.json
 │   ├── vite.config.js
 │   └── package.json
 │
 ├── server/
 │   ├── config/
+│   │   ├── cloudinary.js
+│   │   ├── db.js
+│   │   └── stripe.js
 │   ├── controllers/
 │   ├── middleware/
 │   ├── models/
@@ -779,6 +818,7 @@ Ecommerce-Project/
 │   └── package.json
 │
 ├── .gitignore
+├── package.json
 └── README.md
 ```
 
@@ -790,13 +830,24 @@ Install:
 
 - Node.js 20+
 - npm
-- MongoDB Community Server
 - Git
+
+For local development:
+
+- MongoDB Community Server
 
 Optional:
 
 - MongoDB Compass
 - Stripe CLI
+
+Production services use:
+
+- MongoDB Atlas
+- Vercel
+- Cloudinary
+- Stripe
+- SMTP
 
 ---
 
@@ -821,10 +872,11 @@ to:
 .env
 ```
 
-Example configuration:
+Example local configuration:
 
 ```env
 PORT=5000
+
 MONGODB_URI=mongodb://127.0.0.1:27017/mern_ecommerce
 
 CLIENT_URL=http://localhost:5173
@@ -834,6 +886,10 @@ JWT_ACCESS_EXPIRES=15m
 
 STRIPE_SECRET_KEY=your_stripe_test_secret
 STRIPE_WEBHOOK_SECRET=your_webhook_secret
+
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 
 SMTP_HOST=
 SMTP_PORT=
@@ -893,7 +949,7 @@ to:
 .env
 ```
 
-Example:
+Example local configuration:
 
 ```env
 VITE_API_URL=http://localhost:5000/api
@@ -922,20 +978,30 @@ Run:
 
 ```bash
 cd server
-npm run create-admin
+npm run create-admin -- admin@example.com Password123 Admin
 ```
 
-Configure the required administrator information before running the script.
+When creating an administrator for MongoDB Atlas, make sure `MONGODB_URI` points to the Atlas database before running the command.
 
 ---
 
 ## Product Seeding
 
-The backend includes a product seeding utility:
+The backend includes a product seeding utility.
+
+An approved vendor must exist before products are seeded.
+
+Run:
 
 ```bash
 cd server
 npm run seed:products
+```
+
+Or from the project root:
+
+```bash
+npm run seed:products --prefix server
 ```
 
 ---
@@ -990,6 +1056,220 @@ The E2E authentication-rate-limit bypass is disabled automatically in production
 
 ---
 
+# Production Deployment
+
+The project is deployed using separate frontend and backend Vercel projects.
+
+## Production Services
+
+- Frontend: Vercel
+- Backend API: Vercel
+- Database: MongoDB Atlas
+- Product images: Cloudinary
+- Payments: Stripe test mode
+- Email delivery: SMTP
+
+---
+
+## Production Frontend
+
+```text
+https://ecommerce-frontend-bay-one.vercel.app
+```
+
+---
+
+## Production Backend
+
+```text
+https://ecommerce-api-rehan-27b3.vercel.app
+```
+
+---
+
+## Production API Health Check
+
+```text
+https://ecommerce-api-rehan-27b3.vercel.app/api/health
+```
+
+---
+
+## Frontend Production Environment Variables
+
+```env
+VITE_API_URL=/api
+VITE_STRIPE_PUBLISHABLE_KEY=
+```
+
+The frontend uses a Vercel rewrite to proxy `/api/*` requests to the backend API.
+
+Example Vercel rewrite:
+
+```json
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://ecommerce-api-rehan-27b3.vercel.app/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+This configuration also supports direct navigation to React Router routes.
+
+---
+
+## Backend Production Environment Variables
+
+```env
+NODE_ENV=production
+
+MONGODB_URI=
+CLIENT_URL=
+
+JWT_ACCESS_SECRET=
+JWT_ACCESS_EXPIRES=15m
+
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
+EMAIL_FROM=
+```
+
+Real secret values must never be committed to GitHub.
+
+---
+
+## MongoDB Atlas
+
+The production backend uses MongoDB Atlas instead of the local MongoDB Community Server.
+
+The application connects using:
+
+```text
+MONGODB_URI
+```
+
+Production database data includes:
+
+- Users
+- Vendors
+- Categories
+- Products
+- Carts
+- Orders
+- Payments
+- Reviews
+- Wishlists
+- Returns
+- Coupons
+- Shipping methods
+- Notifications
+
+---
+
+## Cloudinary Production Storage
+
+Production product images are uploaded to Cloudinary rather than the Vercel filesystem.
+
+Uploaded image URLs use Cloudinary-hosted URLs such as:
+
+```text
+https://res.cloudinary.com/...
+```
+
+This prevents uploaded files from disappearing after serverless redeployments.
+
+---
+
+## Stripe Production Integration
+
+The deployed application uses Stripe in test mode.
+
+Stripe test payments can be performed using:
+
+```text
+4242 4242 4242 4242
+```
+
+Example expiry:
+
+```text
+12/34
+```
+
+Example CVC:
+
+```text
+123
+```
+
+No real payments are processed while Stripe remains in test mode.
+
+---
+
+## Stripe Webhook Deployment
+
+Production webhook endpoint:
+
+```text
+https://ecommerce-api-rehan-27b3.vercel.app/api/payments/webhook
+```
+
+Configured events:
+
+```text
+payment_intent.succeeded
+payment_intent.payment_failed
+refund.updated
+```
+
+The webhook signing secret is stored in:
+
+```text
+STRIPE_WEBHOOK_SECRET
+```
+
+---
+
+## Production Email Configuration
+
+Transactional emails use SMTP configuration.
+
+Production variables include:
+
+```env
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
+EMAIL_FROM=
+```
+
+The deployed application has working email flows for:
+
+- Welcome emails
+- Password reset emails
+- Order confirmation emails
+- Order status notifications
+- Vendor approval notifications
+
+---
+
 ## Full Verification
 
 ### Backend
@@ -1029,62 +1309,160 @@ Dependency audit           PASS
 ## Current Verification Status
 
 ```text
-Backend tests             18 / 18 PASS
-Frontend tests            38 / 38 PASS
-Playwright tests          48 / 48 PASS
-Frontend ESLint           PASS
-Vite production build     PASS
-Client npm audit          0 vulnerabilities
-Server npm audit          0 vulnerabilities
-MongoDB connection        PASS
-Customer flow             PASS
-Vendor flow               PASS
-Admin flow                PASS
-Cart mutation             PASS
-Vendor product CRUD       PASS
-Product moderation        PASS
-Role authorization        PASS
-CSRF authentication flow  PASS
-Accessibility testing     PASS
+Backend tests              18 / 18 PASS
+Frontend tests             38 / 38 PASS
+Playwright tests           48 / 48 PASS
+Frontend ESLint            PASS
+Vite production build      PASS
+Client npm audit           0 vulnerabilities
+Server npm audit           0 vulnerabilities
+
+MongoDB local connection   PASS
+MongoDB Atlas connection   PASS
+
+Frontend deployment        PASS
+Backend deployment         PASS
+
+Customer registration      PASS
+Customer login             PASS
+Session restoration        PASS
+Logout                     PASS
+
+Admin authentication       PASS
+Vendor workflow            PASS
+Vendor approval            PASS
+
+Product seeding            PASS
+Product browsing           PASS
+Product CRUD               PASS
+Product moderation         PASS
+
+Cloudinary image upload    PASS
+Cloud image persistence    PASS
+
+Cart mutation              PASS
+Wishlist                   PASS
+Checkout                   PASS
+
+Stripe PaymentIntent       PASS
+Stripe test payment        PASS
+Stripe webhook delivery    PASS
+Order creation             PASS
+
+SMTP email delivery        PASS
+Welcome email              PASS
+Password reset email       PASS
+Password reset flow        PASS
+
+Role authorization         PASS
+CSRF authentication flow   PASS
+Rate limiting              PASS
+Accessibility testing      PASS
 ```
 
 ---
 
-## Local Development Scope
-
-The current project is designed for local development and portfolio demonstration.
-
-The environment currently uses:
+## Deployment Architecture
 
 ```text
-MongoDB Community Server
-Local Node/Express backend
-Local Vite frontend
-Stripe test mode
+Browser
+   ↓
+Vercel Frontend
+React + Vite
+   ↓
+/api proxy
+   ↓
+Vercel Backend
+Node.js + Express
+   ↓
+MongoDB Atlas
+
+Product Images
+   ↓
+Cloudinary
+
+Payments
+   ↓
+Stripe
+
+Transactional Email
+   ↓
+SMTP
 ```
 
-Production deployment is intentionally outside the current project scope.
+---
+
+## Current Deployment Scope
+
+The deployed application is intended as a professional portfolio and demonstration marketplace.
+
+The project includes a functioning cloud deployment with:
+
+- Public frontend
+- Public API
+- Cloud database
+- Persistent cloud image storage
+- Test payment processing
+- Stripe webhook handling
+- Transactional email delivery
+- Authentication
+- Authorization
+- Multi-vendor workflows
+- Admin workflows
+
+Stripe remains in test mode, therefore no real customer payments are processed.
+
+---
+
+## Production Considerations Before Real Commercial Use
+
+Before operating the marketplace as a real commercial business, additional operational work would be recommended, including:
+
+- Stripe live-mode activation
+- Production payment verification
+- Custom frontend domain
+- Custom backend domain
+- Privacy policy
+- Terms and conditions
+- Refund policy
+- Cookie policy
+- Formal security review
+- Centralized production logging
+- Error monitoring
+- Uptime monitoring
+- Database backups
+- Disaster recovery planning
+- Transactional email provider hardening
+- CDN and caching optimization
+- CI/CD approval controls
+- Production analytics
+- Rate-limit monitoring
+- Dependency update automation
 
 ---
 
 ## Possible Future Improvements
 
-Future production-oriented improvements could include:
+Future improvements could include:
 
-- Cloud deployment
-- CI/CD deployment pipelines
-- MongoDB transactions on a replica set
-- Multi-device refresh-session management
-- Cloud image storage
-- CDN integration
 - Redis caching
 - Queue-based email processing
 - Advanced search infrastructure
 - Product recommendations
 - Real-time notifications
-- Centralized monitoring
-- Structured production logging
+- WebSocket support
+- Advanced seller reporting
+- Multi-device refresh-session management
+- MongoDB transactions on supported replica-set workflows
+- Centralized logging
+- Error tracking
+- Analytics dashboards
+- Performance monitoring
+- CDN optimization
+- Automated backups
 - Additional E2E scenarios
+- Dedicated CI/CD deployment pipeline
+- Custom domain support
 
 ---
 
@@ -1098,6 +1476,28 @@ https://github.com/rehan-manzoor/Ecommerce-Project
 
 ---
 
+## Live Application
+
+Frontend:
+
+```text
+https://ecommerce-frontend-bay-one.vercel.app
+```
+
+Backend:
+
+```text
+https://ecommerce-api-rehan-27b3.vercel.app
+```
+
+Health check:
+
+```text
+https://ecommerce-api-rehan-27b3.vercel.app/api/health
+```
+
+---
+
 ## License
 
-This project is intended for educational and portfolio purposes.
+This project is intended for educational, portfolio, demonstration, and learning purposes.
