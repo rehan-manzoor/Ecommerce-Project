@@ -9,7 +9,7 @@
     "dev": "nodemon server.js",
     "migrate:legacy": "node scripts/migrateLegacyData.js",
     "create-admin": "node scripts/createAdmin.js",
-    "test": "node --test tests/*.test.js",
+    "test": "node --test tests/api.test.js tests/coupon.test.js tests/pricing.test.js tests/return.test.js",
     "migrate:marketplace": "node scripts/migrateMarketplace.js",
     "seed:products": "node scripts/seedProducts.js",
     "products:update-images": "node scripts/updateProductImages.js"

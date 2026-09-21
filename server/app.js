@@ -1,3 +1,4 @@
+import connectDB from "./config/db.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -23,6 +24,33 @@ import returnRoutes from "./routes/returnRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
+app.use(async (req, res, next) => {
+  try {
+    // Unit/API tests mock database models,
+    // so they should not open a real MongoDB connection.
+    if (
+      process.env.NODE_ENV === "test" ||
+      req.path === "/api/health"
+    ) {
+      return next();
+    }
+
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error(
+      "Database connection failed:",
+      error.message
+    );
+
+    return res.status(503).json({
+      success: false,
+      message: "Database connection unavailable",
+      data: null,
+      error: null,
+    });
+  }
+});
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(cors({ origin: (process.env.CLIENT_URL || "http://localhost:5173").split(",").map((url) => url.trim()), credentials: true }));
 app.post("/api/payments/webhook", express.raw({ type: "application/json" }), stripeWebhook);
