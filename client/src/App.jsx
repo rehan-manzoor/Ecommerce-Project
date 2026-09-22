@@ -1,12 +1,14 @@
 import "./App.css";
-import { useAuth } from "./context/AuthContext";
 import { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router";
+
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import VendorRoute from "./components/VendorRoute";
+
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -29,39 +31,61 @@ import Wishlist from "./pages/Wishlist";
 import Notifications from "./pages/Notifications";
 import Returns from "./pages/Returns";
 
-// Browsers keep the previous scroll position on client-side navigation;
-// jump back to the top so a new page never opens mid-scroll.
 function ScrollToTop() {
   const { pathname } = useLocation();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
   return null;
 }
 
 export default function App() {
   const location = useLocation();
-  const { ready } = useAuth();
-  if (!ready) return <div className="state-card page-state">Restoring session...</div>;
+
   const isDashboard =
-    location.pathname.startsWith("/admin") || location.pathname.startsWith("/vendor");
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/vendor");
 
   return (
     <div className="app-shell">
       <ScrollToTop />
+
       <Navbar />
 
       <div className="app-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
+
           <Route path="/login" element={<Login />} />
+
           <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+          <Route
+            path="/forgot-password"
+            element={<ForgotPassword />}
+          />
+
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPassword />}
+          />
+
           <Route path="/products" element={<Products />} />
-          <Route path="/products/:id" element={<ProductDetails />} />
-          <Route path="/store/:slug" element={<VendorStore />} />
+
+          <Route
+            path="/products/:id"
+            element={<ProductDetails />}
+          />
+
+          <Route
+            path="/store/:slug"
+            element={<VendorStore />}
+          />
+
           <Route path="/cart" element={<Cart />} />
+
           <Route
             path="/checkout"
             element={
@@ -70,6 +94,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/payment"
             element={
@@ -78,6 +103,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/payment-success"
             element={
@@ -86,6 +112,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/wishlist"
             element={
@@ -94,6 +121,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/notifications"
             element={
@@ -102,6 +130,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/returns"
             element={
@@ -110,6 +139,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/orders"
             element={
@@ -118,6 +148,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/profile"
             element={
@@ -126,6 +157,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/become-vendor"
             element={
@@ -134,6 +166,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/*"
             element={
@@ -142,6 +175,7 @@ export default function App() {
               </AdminRoute>
             }
           />
+
           <Route
             path="/vendor/*"
             element={
@@ -150,7 +184,11 @@ export default function App() {
               </VendorRoute>
             }
           />
-          <Route path="*" element={<NotFound />} />
+
+          <Route
+            path="*"
+            element={<NotFound />}
+          />
         </Routes>
       </div>
 

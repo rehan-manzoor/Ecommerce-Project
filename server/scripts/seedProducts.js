@@ -217,7 +217,7 @@ const seed = async () => {
         console.log(`Category created: ${categoryName}`);
       }
 
-      for (const [name, description, brand, price, stock] of products) {
+      for (const [name, description, brand, price, stock, image] of products) {
         const slug = slugify(name);
 
         const exists = await Product.findOne({ slug });
@@ -238,7 +238,7 @@ const seed = async () => {
           stock,
 
           // Later you can replace these with uploaded images
-          images: [],
+          images: image ? [image] : [],
 
           status: "active",
           approvalStatus: "approved",
