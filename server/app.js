@@ -30,20 +30,14 @@ app.set("trust proxy", 1);
 
 app.use(async (req, res, next) => {
   try {
-    if (
-      process.env.NODE_ENV === "test" ||
-      req.path === "/api/health"
-    ) {
+    if (process.env.NODE_ENV === "test" || req.path === "/api/health") {
       return next();
     }
 
     await connectDB();
     next();
   } catch (error) {
-    console.error(
-      "Database connection failed:",
-      error.message
-    );
+    console.error("Database connection failed:", error.message);
 
     return res.status(503).json({
       success: false,
@@ -64,12 +58,7 @@ app.use(
 
 app.use(
   cors({
-    origin: (
-      process.env.CLIENT_URL ||
-      "http://localhost:5173"
-    )
-      .split(",")
-      .map((url) => url.trim()),
+    origin: (process.env.CLIENT_URL || "http://localhost:5173").split(",").map((url) => url.trim()),
     credentials: true,
   })
 );
@@ -113,17 +102,11 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
-app.use(
-  "/api/vendor/analytics",
-  vendorAnalyticsRoutes
-);
+app.use("/api/vendor/analytics", vendorAnalyticsRoutes);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/shipping", shippingRoutes);
-app.use(
-  "/api/notifications",
-  notificationRoutes
-);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/returns", returnRoutes);
 
 app.use((_req, res) =>

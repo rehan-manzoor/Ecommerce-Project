@@ -29,7 +29,7 @@ const imageMap = {
 
   Blender: "https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=800",
 
-  "Cookware Set": "https://images.unsplash.com/photo-1584990347449-a9a2aa4f2f69?w=800",
+  "Cookware Set": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800",
 
   "Table Lamp": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800",
 

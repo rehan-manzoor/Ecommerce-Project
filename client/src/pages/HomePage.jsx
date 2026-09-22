@@ -1,3 +1,4 @@
+import { getCategories } from "../services/categoryService";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import api from "../api/axios";
@@ -8,10 +9,11 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([api.get("/products?limit=8&sort=newest"), api.get("/categories")])
-      .then(([p, c]) => {
-        setProducts(p.data.data || []);
-        setCategories(c.data.data || []);
+    Promise.all([api.get("/products?limit=8&sort=newest"), getCategories()])
+      .then(([productsResponse, categoryData]) => {
+        setProducts(productsResponse.data.data || []);
+
+        setCategories(categoryData);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -122,7 +124,12 @@ export default function HomePage() {
               <Link className="product-card" key={product._id} to={`/products/${product._id}`}>
                 <div className="product-image">
                   {product.images?.[0] ? (
-                    <img src={product.images[0]} alt={product.name} />
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      loading="lazy"
+                      decoding="async"
+                    />
                   ) : (
                     <span>No image</span>
                   )}

@@ -1,3 +1,4 @@
+import { getCategories } from "../services/categoryService";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import api from "../api/axios";
@@ -13,9 +14,8 @@ export default function Products() {
   const query = useMemo(() => searchParams.toString(), [searchParams]);
 
   useEffect(() => {
-    api
-      .get("/categories")
-      .then((r) => setCategories(r.data.data || []))
+    getCategories()
+      .then(setCategories)
       .catch(() => {});
   }, []);
 
@@ -201,7 +201,7 @@ function ProductCard({ product }) {
     <Link className="product-card" to={`/products/${product._id}`}>
       <div className="product-image">
         {product.images?.[0] ? (
-          <img src={product.images[0]} alt={product.name} />
+          <img src={product.images[0]} alt={product.name} loading="lazy" decoding="async" />
         ) : (
           <span>No image</span>
         )}

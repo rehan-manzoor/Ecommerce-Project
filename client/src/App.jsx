@@ -45,8 +45,7 @@ export default function App() {
   const location = useLocation();
 
   const isDashboard =
-    location.pathname.startsWith("/admin") ||
-    location.pathname.startsWith("/vendor");
+    location.pathname.startsWith("/admin") || location.pathname.startsWith("/vendor");
 
   return (
     <div className="app-shell">
@@ -62,27 +61,15 @@ export default function App() {
 
           <Route path="/register" element={<Register />} />
 
-          <Route
-            path="/forgot-password"
-            element={<ForgotPassword />}
-          />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          <Route
-            path="/reset-password/:token"
-            element={<ResetPassword />}
-          />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           <Route path="/products" element={<Products />} />
 
-          <Route
-            path="/products/:id"
-            element={<ProductDetails />}
-          />
+          <Route path="/products/:id" element={<ProductDetails />} />
 
-          <Route
-            path="/store/:slug"
-            element={<VendorStore />}
-          />
+          <Route path="/store/:slug" element={<VendorStore />} />
 
           <Route path="/cart" element={<Cart />} />
 
@@ -185,10 +172,7 @@ export default function App() {
             }
           />
 
-          <Route
-            path="*"
-            element={<NotFound />}
-          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
 

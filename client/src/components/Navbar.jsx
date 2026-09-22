@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
-import api from "../api/axios";
+import { getCategories } from "../services/categoryService";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -11,9 +11,8 @@ export default function Navbar() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    api
-      .get("/categories")
-      .then((r) => setCategories(r.data.data || []))
+    getCategories()
+      .then(setCategories)
       .catch(() => {});
   }, []);
 

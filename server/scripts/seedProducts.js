@@ -90,7 +90,7 @@ const productsData = {
       "ChefHome",
       110,
       12,
-      "https://images.unsplash.com/photo-1584990347449-a9a2aa4f2f69?w=800",
+      "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800",
     ],
   ],
 
