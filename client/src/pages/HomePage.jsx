@@ -1,3 +1,4 @@
+import { optimizeImageUrl } from "../utils/imageUrl";
 import { getCategories } from "../services/categoryService";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
@@ -125,11 +126,14 @@ export default function HomePage() {
                 <div className="product-image">
                   {product.images?.[0] ? (
                     <img
-                      src={product.images[0]}
-                      alt={product.name}
-                      loading="lazy"
-                      decoding="async"
-                    />
+  src={optimizeImageUrl(
+    product.images[0],
+    600
+  )}
+  alt={product.name}
+  loading="lazy"
+  decoding="async"
+/>
                   ) : (
                     <span>No image</span>
                   )}

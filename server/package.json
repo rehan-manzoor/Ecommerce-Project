@@ -12,7 +12,8 @@
     "test": "node --test tests/api.test.js tests/coupon.test.js tests/pricing.test.js tests/return.test.js",
     "migrate:marketplace": "node scripts/migrateMarketplace.js",
     "seed:products": "node scripts/seedProducts.js",
-    "products:update-images": "node scripts/updateProductImages.js"
+    "products:update-images": "node scripts/updateProductImages.js",
+    "products:migrate-images": "node scripts/migrateProductImagesToCloudinary.js"
   },
   "keywords": [],
   "author": "",

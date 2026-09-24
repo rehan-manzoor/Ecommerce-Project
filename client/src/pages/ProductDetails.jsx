@@ -1,3 +1,4 @@
+import { optimizeImageUrl } from "../utils/imageUrl";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import api from "../api/axios";
@@ -121,8 +122,16 @@ export default function ProductDetails() {
       <div className="product-details-card">
         <div className="product-gallery">
           <div className="details-image">
-            {selectedImage ? <img src={selectedImage} alt={product.name} /> : <span>No image</span>}
-          </div>
+  {selectedImage ? (
+    <img
+      src={optimizeImageUrl(selectedImage, 1200)}
+      alt={product.name}
+      decoding="async"
+    />
+  ) : (
+    <span>No image</span>
+  )}
+</div>
 
           {product.images?.length > 1 && (
             <div className="product-thumbnails">
@@ -134,7 +143,12 @@ export default function ProductDetails() {
                   onClick={() => setSelectedImage(image)}
                   aria-label={`View ${product.name} image ${index + 1}`}
                 >
-                  <img src={image} alt={`${product.name} thumbnail ${index + 1}`} />
+                  <img
+  src={optimizeImageUrl(image, 200)}
+  alt={`${product.name} thumbnail ${index + 1}`}
+  loading="lazy"
+  decoding="async"
+/>
                 </button>
               ))}
             </div>

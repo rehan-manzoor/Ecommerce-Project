@@ -1,3 +1,4 @@
+import { optimizeImageUrl } from "../utils/imageUrl";
 import { getCategories } from "../services/categoryService";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
@@ -201,7 +202,15 @@ function ProductCard({ product }) {
     <Link className="product-card" to={`/products/${product._id}`}>
       <div className="product-image">
         {product.images?.[0] ? (
-          <img src={product.images[0]} alt={product.name} loading="lazy" decoding="async" />
+          <img
+  src={optimizeImageUrl(
+    product.images[0],
+    600
+  )}
+  alt={product.name}
+  loading="lazy"
+  decoding="async"
+/>
         ) : (
           <span>No image</span>
         )}
