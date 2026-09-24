@@ -1,6 +1,16 @@
 import "./App.css";
-import { useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router";
+
+import {
+  lazy,
+  Suspense,
+  useEffect,
+} from "react";
+
+import {
+  Routes,
+  Route,
+  useLocation,
+} from "react-router";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -9,27 +19,95 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import VendorRoute from "./components/VendorRoute";
 
+/*
+ * Keep the homepage eager because it is the
+ * first page most visitors will see.
+ */
 import HomePage from "./pages/HomePage";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Products from "./pages/Products";
-import ProductDetails from "./pages/ProductDetails";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import Payment from "./pages/Payment";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import Orders from "./pages/Orders";
-import Profile from "./pages/Profile";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import BecomeVendor from "./pages/BecomeVendor";
-import VendorStore from "./pages/VendorStore";
-import Admin from "./pages/Admin";
-import Vendor from "./pages/Vendor";
-import NotFound from "./pages/NotFound";
-import Wishlist from "./pages/Wishlist";
-import Notifications from "./pages/Notifications";
-import Returns from "./pages/Returns";
+
+/*
+ * Everything else is downloaded only when
+ * the user actually visits that route.
+ */
+const Login = lazy(() =>
+  import("./pages/Login")
+);
+
+const Register = lazy(() =>
+  import("./pages/Register")
+);
+
+const Products = lazy(() =>
+  import("./pages/Products")
+);
+
+const ProductDetails = lazy(() =>
+  import("./pages/ProductDetails")
+);
+
+const Cart = lazy(() =>
+  import("./pages/Cart")
+);
+
+const Checkout = lazy(() =>
+  import("./pages/Checkout")
+);
+
+const Payment = lazy(() =>
+  import("./pages/Payment")
+);
+
+const PaymentSuccess = lazy(() =>
+  import("./pages/PaymentSuccess")
+);
+
+const Orders = lazy(() =>
+  import("./pages/Orders")
+);
+
+const Profile = lazy(() =>
+  import("./pages/Profile")
+);
+
+const ForgotPassword = lazy(() =>
+  import("./pages/ForgotPassword")
+);
+
+const ResetPassword = lazy(() =>
+  import("./pages/ResetPassword")
+);
+
+const BecomeVendor = lazy(() =>
+  import("./pages/BecomeVendor")
+);
+
+const VendorStore = lazy(() =>
+  import("./pages/VendorStore")
+);
+
+const Admin = lazy(() =>
+  import("./pages/Admin")
+);
+
+const Vendor = lazy(() =>
+  import("./pages/Vendor")
+);
+
+const NotFound = lazy(() =>
+  import("./pages/NotFound")
+);
+
+const Wishlist = lazy(() =>
+  import("./pages/Wishlist")
+);
+
+const Notifications = lazy(() =>
+  import("./pages/Notifications")
+);
+
+const Returns = lazy(() =>
+  import("./pages/Returns")
+);
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -41,11 +119,24 @@ function ScrollToTop() {
   return null;
 }
 
+function RouteLoader() {
+  return (
+    <div className="state-card page-state">
+      Loading...
+    </div>
+  );
+}
+
 export default function App() {
   const location = useLocation();
 
   const isDashboard =
-    location.pathname.startsWith("/admin") || location.pathname.startsWith("/vendor");
+    location.pathname.startsWith(
+      "/admin"
+    ) ||
+    location.pathname.startsWith(
+      "/vendor"
+    );
 
   return (
     <div className="app-shell">
@@ -54,126 +145,162 @@ export default function App() {
       <Navbar />
 
       <div className="app-content">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
+        <Suspense
+          fallback={<RouteLoader />}
+        >
+          <Routes>
+            <Route
+              path="/"
+              element={<HomePage />}
+            />
 
-          <Route path="/login" element={<Login />} />
+            <Route
+              path="/login"
+              element={<Login />}
+            />
 
-          <Route path="/register" element={<Register />} />
+            <Route
+              path="/register"
+              element={<Register />}
+            />
 
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route
+              path="/forgot-password"
+              element={<ForgotPassword />}
+            />
 
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route
+              path="/reset-password/:token"
+              element={<ResetPassword />}
+            />
 
-          <Route path="/products" element={<Products />} />
+            <Route
+              path="/products"
+              element={<Products />}
+            />
 
-          <Route path="/products/:id" element={<ProductDetails />} />
+            <Route
+              path="/products/:id"
+              element={
+                <ProductDetails />
+              }
+            />
 
-          <Route path="/store/:slug" element={<VendorStore />} />
+            <Route
+              path="/store/:slug"
+              element={<VendorStore />}
+            />
 
-          <Route path="/cart" element={<Cart />} />
+            <Route
+              path="/cart"
+              element={<Cart />}
+            />
 
-          <Route
-            path="/checkout"
-            element={
-              <ProtectedRoute>
-                <Checkout />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/payment"
-            element={
-              <ProtectedRoute>
-                <Payment />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/payment"
+              element={
+                <ProtectedRoute>
+                  <Payment />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/payment-success"
-            element={
-              <ProtectedRoute>
-                <PaymentSuccess />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/payment-success"
+              element={
+                <ProtectedRoute>
+                  <PaymentSuccess />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/wishlist"
-            element={
-              <ProtectedRoute>
-                <Wishlist />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/wishlist"
+              element={
+                <ProtectedRoute>
+                  <Wishlist />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/notifications"
-            element={
-              <ProtectedRoute>
-                <Notifications />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute>
+                  <Notifications />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/returns"
-            element={
-              <ProtectedRoute>
-                <Returns />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/returns"
+              element={
+                <ProtectedRoute>
+                  <Returns />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/orders"
-            element={
-              <ProtectedRoute>
-                <Orders />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/become-vendor"
-            element={
-              <ProtectedRoute>
-                <BecomeVendor />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/become-vendor"
+              element={
+                <ProtectedRoute>
+                  <BecomeVendor />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/admin/*"
-            element={
-              <AdminRoute>
-                <Admin />
-              </AdminRoute>
-            }
-          />
+            <Route
+              path="/admin/*"
+              element={
+                <AdminRoute>
+                  <Admin />
+                </AdminRoute>
+              }
+            />
 
-          <Route
-            path="/vendor/*"
-            element={
-              <VendorRoute>
-                <Vendor />
-              </VendorRoute>
-            }
-          />
+            <Route
+              path="/vendor/*"
+              element={
+                <VendorRoute>
+                  <Vendor />
+                </VendorRoute>
+              }
+            />
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route
+              path="*"
+              element={<NotFound />}
+            />
+          </Routes>
+        </Suspense>
       </div>
 
       {!isDashboard && <Footer />}
