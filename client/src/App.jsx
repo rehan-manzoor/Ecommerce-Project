@@ -1,16 +1,8 @@
 import "./App.css";
 
-import {
-  lazy,
-  Suspense,
-  useEffect,
-} from "react";
+import { lazy, Suspense, useEffect } from "react";
 
-import {
-  Routes,
-  Route,
-  useLocation,
-} from "react-router";
+import { Routes, Route, useLocation } from "react-router";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -29,85 +21,45 @@ import HomePage from "./pages/HomePage";
  * Everything else is downloaded only when
  * the user actually visits that route.
  */
-const Login = lazy(() =>
-  import("./pages/Login")
-);
+const Login = lazy(() => import("./pages/Login"));
 
-const Register = lazy(() =>
-  import("./pages/Register")
-);
+const Register = lazy(() => import("./pages/Register"));
 
-const Products = lazy(() =>
-  import("./pages/Products")
-);
+const Products = lazy(() => import("./pages/Products"));
 
-const ProductDetails = lazy(() =>
-  import("./pages/ProductDetails")
-);
+const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 
-const Cart = lazy(() =>
-  import("./pages/Cart")
-);
+const Cart = lazy(() => import("./pages/Cart"));
 
-const Checkout = lazy(() =>
-  import("./pages/Checkout")
-);
+const Checkout = lazy(() => import("./pages/Checkout"));
 
-const Payment = lazy(() =>
-  import("./pages/Payment")
-);
+const Payment = lazy(() => import("./pages/Payment"));
 
-const PaymentSuccess = lazy(() =>
-  import("./pages/PaymentSuccess")
-);
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 
-const Orders = lazy(() =>
-  import("./pages/Orders")
-);
+const Orders = lazy(() => import("./pages/Orders"));
 
-const Profile = lazy(() =>
-  import("./pages/Profile")
-);
+const Profile = lazy(() => import("./pages/Profile"));
 
-const ForgotPassword = lazy(() =>
-  import("./pages/ForgotPassword")
-);
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 
-const ResetPassword = lazy(() =>
-  import("./pages/ResetPassword")
-);
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
-const BecomeVendor = lazy(() =>
-  import("./pages/BecomeVendor")
-);
+const BecomeVendor = lazy(() => import("./pages/BecomeVendor"));
 
-const VendorStore = lazy(() =>
-  import("./pages/VendorStore")
-);
+const VendorStore = lazy(() => import("./pages/VendorStore"));
 
-const Admin = lazy(() =>
-  import("./pages/Admin")
-);
+const Admin = lazy(() => import("./pages/Admin"));
 
-const Vendor = lazy(() =>
-  import("./pages/Vendor")
-);
+const Vendor = lazy(() => import("./pages/Vendor"));
 
-const NotFound = lazy(() =>
-  import("./pages/NotFound")
-);
+const NotFound = lazy(() => import("./pages/NotFound"));
 
-const Wishlist = lazy(() =>
-  import("./pages/Wishlist")
-);
+const Wishlist = lazy(() => import("./pages/Wishlist"));
 
-const Notifications = lazy(() =>
-  import("./pages/Notifications")
-);
+const Notifications = lazy(() => import("./pages/Notifications"));
 
-const Returns = lazy(() =>
-  import("./pages/Returns")
-);
+const Returns = lazy(() => import("./pages/Returns"));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -120,23 +72,14 @@ function ScrollToTop() {
 }
 
 function RouteLoader() {
-  return (
-    <div className="state-card page-state">
-      Loading...
-    </div>
-  );
+  return <div className="state-card page-state">Loading...</div>;
 }
 
 export default function App() {
   const location = useLocation();
 
   const isDashboard =
-    location.pathname.startsWith(
-      "/admin"
-    ) ||
-    location.pathname.startsWith(
-      "/vendor"
-    );
+    location.pathname.startsWith("/admin") || location.pathname.startsWith("/vendor");
 
   return (
     <div className="app-shell">
@@ -145,56 +88,25 @@ export default function App() {
       <Navbar />
 
       <div className="app-content">
-        <Suspense
-          fallback={<RouteLoader />}
-        >
+        <Suspense fallback={<RouteLoader />}>
           <Routes>
-            <Route
-              path="/"
-              element={<HomePage />}
-            />
+            <Route path="/" element={<HomePage />} />
 
-            <Route
-              path="/login"
-              element={<Login />}
-            />
+            <Route path="/login" element={<Login />} />
 
-            <Route
-              path="/register"
-              element={<Register />}
-            />
+            <Route path="/register" element={<Register />} />
 
-            <Route
-              path="/forgot-password"
-              element={<ForgotPassword />}
-            />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
 
-            <Route
-              path="/reset-password/:token"
-              element={<ResetPassword />}
-            />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-            <Route
-              path="/products"
-              element={<Products />}
-            />
+            <Route path="/products" element={<Products />} />
 
-            <Route
-              path="/products/:id"
-              element={
-                <ProductDetails />
-              }
-            />
+            <Route path="/products/:id" element={<ProductDetails />} />
 
-            <Route
-              path="/store/:slug"
-              element={<VendorStore />}
-            />
+            <Route path="/store/:slug" element={<VendorStore />} />
 
-            <Route
-              path="/cart"
-              element={<Cart />}
-            />
+            <Route path="/cart" element={<Cart />} />
 
             <Route
               path="/checkout"
@@ -295,10 +207,7 @@ export default function App() {
               }
             />
 
-            <Route
-              path="*"
-              element={<NotFound />}
-            />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </div>

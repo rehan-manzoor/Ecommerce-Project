@@ -122,16 +122,16 @@ export default function ProductDetails() {
       <div className="product-details-card">
         <div className="product-gallery">
           <div className="details-image">
-  {selectedImage ? (
-    <img
-      src={optimizeImageUrl(selectedImage, 1200)}
-      alt={product.name}
-      decoding="async"
-    />
-  ) : (
-    <span>No image</span>
-  )}
-</div>
+            {selectedImage ? (
+              <img
+                src={optimizeImageUrl(selectedImage, 1200)}
+                alt={product.name}
+                decoding="async"
+              />
+            ) : (
+              <span>No image</span>
+            )}
+          </div>
 
           {product.images?.length > 1 && (
             <div className="product-thumbnails">
@@ -144,11 +144,11 @@ export default function ProductDetails() {
                   aria-label={`View ${product.name} image ${index + 1}`}
                 >
                   <img
-  src={optimizeImageUrl(image, 200)}
-  alt={`${product.name} thumbnail ${index + 1}`}
-  loading="lazy"
-  decoding="async"
-/>
+                    src={optimizeImageUrl(image, 200)}
+                    alt={`${product.name} thumbnail ${index + 1}`}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </button>
               ))}
             </div>

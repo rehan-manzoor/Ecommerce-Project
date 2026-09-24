@@ -112,9 +112,14 @@ export const refreshLogin = async (req, res, next) => {
     const refresh = req.cookies?.refreshToken;
 
     if (!refresh) {
-      return res.status(401).json({
-        success: false,
-        message: "Session expired",
+      return res.status(200).json({
+        success: true,
+        message: "No active session",
+        data: {
+          authenticated: false,
+          token: null,
+          user: null,
+        },
       });
     }
 

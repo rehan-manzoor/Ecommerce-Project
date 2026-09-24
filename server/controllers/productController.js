@@ -120,26 +120,21 @@ export const getProducts = async (req, res, next) => {
     const sort = sortMap[req.query.sort] || sortMap.newest;
 
     const [totalResults, products] = await Promise.all([
-  Product.countDocuments(filter),
+      Product.countDocuments(filter),
 
-  Product.find(filter)
-    .select(
-        "name slug description brand price salePrice stock images ratingsAverage numReviews category vendor createdAt"
-      )
-    .populate("vendor", "storeName storeSlug logo")
-    .populate("category", "name slug")
-    .sort(sort)
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .lean(),
-]);
-     
+      Product.find(filter)
+        .select(
+          "name slug description brand price salePrice stock images ratingsAverage numReviews category vendor createdAt"
+        )
+        .populate("vendor", "storeName storeSlug logo")
+        .populate("category", "name slug")
+        .sort(sort)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+    ]);
 
-res.set(
-  "Cache-Control",
-  "public, s-maxage=60, stale-while-revalidate=300"
-);
-
+    res.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
 
     res.json({
       success: true,
@@ -164,10 +159,7 @@ export const getProductById = async (req, res, next) => {
       .populate("category", "name slug")
       .lean();
 
-res.set(
-  "Cache-Control",
-  "public, s-maxage=60, stale-while-revalidate=300"
-);
+    res.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
 
     if (!product)
       return res

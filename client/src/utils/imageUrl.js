@@ -1,13 +1,5 @@
-export const optimizeImageUrl = (
-  url,
-  width = 600
-) => {
-  if (
-    !url ||
-    !url.includes(
-      "res.cloudinary.com"
-    )
-  ) {
+export const optimizeImageUrl = (url, width = 600) => {
+  if (!url || !url.includes("res.cloudinary.com")) {
     return url;
   }
 
@@ -15,8 +7,5 @@ export const optimizeImageUrl = (
     return url;
   }
 
-  return url.replace(
-    "/upload/",
-    `/upload/f_auto,q_auto,c_limit,w_${width}/`
-  );
+  return url.replace("/upload/", `/upload/f_auto,q_auto,c_limit,w_${width}/`);
 };

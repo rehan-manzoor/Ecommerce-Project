@@ -4,20 +4,14 @@ import mongoose from "mongoose";
 import cloudinary from "../config/cloudinary.js";
 import Product from "../models/Product.js";
 
-const isCloudinaryUrl = (url) =>
-  typeof url === "string" &&
-  url.includes("res.cloudinary.com");
+const isCloudinaryUrl = (url) => typeof url === "string" && url.includes("res.cloudinary.com");
 
 const migrateImages = async () => {
   try {
-    const mongoUri =
-      process.env.MONGO_URI ||
-      process.env.MONGODB_URI;
+    const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
 
     if (!mongoUri) {
-      throw new Error(
-        "MONGODB_URI is not configured"
-      );
+      throw new Error("MONGODB_URI is not configured");
     }
 
     await mongoose.connect(mongoUri);
@@ -31,9 +25,7 @@ const migrateImages = async () => {
       },
     });
 
-    console.log(
-      `Found ${products.length} products with images`
-    );
+    console.log(`Found ${products.length} products with images`);
 
     let migratedProducts = 0;
     let migratedImages = 0;
@@ -46,9 +38,7 @@ const migrateImages = async () => {
       const nextImages = [];
 
       console.log("");
-      console.log(
-        `Processing: ${product.name}`
-      );
+      console.log(`Processing: ${product.name}`);
 
       for (const imageUrl of product.images) {
         if (!imageUrl) {
@@ -56,9 +46,7 @@ const migrateImages = async () => {
         }
 
         if (isCloudinaryUrl(imageUrl)) {
-          console.log(
-            "  ✓ Already Cloudinary"
-          );
+          console.log("  ✓ Already Cloudinary");
 
           nextImages.push(imageUrl);
           skippedImages++;
@@ -66,46 +54,33 @@ const migrateImages = async () => {
         }
 
         try {
-          console.log(
-            "  Uploading external image..."
-          );
+          console.log("  Uploading external image...");
 
-          const result =
-            await cloudinary.uploader.upload(
-              imageUrl,
+          const result = await cloudinary.uploader.upload(imageUrl, {
+            folder: "mern-marketplace/products",
+            resource_type: "image",
+
+            transformation: [
               {
-                folder:
-                  "mern-marketplace/products",
-                resource_type: "image",
+                width: 1200,
+                height: 1200,
+                crop: "limit",
+                quality: "auto",
+                fetch_format: "auto",
+              },
+            ],
+          });
 
-                transformation: [
-                  {
-                    width: 1200,
-                    height: 1200,
-                    crop: "limit",
-                    quality: "auto",
-                    fetch_format: "auto",
-                  },
-                ],
-              }
-            );
-
-          nextImages.push(
-            result.secure_url
-          );
+          nextImages.push(result.secure_url);
 
           migratedImages++;
           changed = true;
 
-          console.log(
-            "  ✓ Migrated to Cloudinary"
-          );
+          console.log("  ✓ Migrated to Cloudinary");
         } catch (error) {
           failedImages++;
 
-          console.error(
-            `  ✗ Upload failed: ${error.message}`
-          );
+          console.error(`  ✗ Upload failed: ${error.message}`);
 
           /*
            * Preserve original URL if migration
@@ -123,45 +98,26 @@ const migrateImages = async () => {
 
         migratedProducts++;
 
-        console.log(
-          "  ✓ Product updated in MongoDB"
-        );
+        console.log("  ✓ Product updated in MongoDB");
       }
     }
 
     console.log("");
-    console.log(
-      "=============================="
-    );
+    console.log("==============================");
 
-    console.log(
-      `Products migrated: ${migratedProducts}`
-    );
+    console.log(`Products migrated: ${migratedProducts}`);
 
-    console.log(
-      `Images migrated:   ${migratedImages}`
-    );
+    console.log(`Images migrated:   ${migratedImages}`);
 
-    console.log(
-      `Already Cloudinary: ${skippedImages}`
-    );
+    console.log(`Already Cloudinary: ${skippedImages}`);
 
-    console.log(
-      `Failed:            ${failedImages}`
-    );
+    console.log(`Failed:            ${failedImages}`);
 
-    console.log(
-      "=============================="
-    );
+    console.log("==============================");
 
-    console.log(
-      "✅ Product image migration complete"
-    );
+    console.log("✅ Product image migration complete");
   } catch (error) {
-    console.error(
-      "Migration failed:",
-      error
-    );
+    console.error("Migration failed:", error);
 
     process.exitCode = 1;
   } finally {

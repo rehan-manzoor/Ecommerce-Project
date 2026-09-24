@@ -126,23 +126,12 @@ export default function HomePage() {
                 <div className="product-image">
                   {product.images?.[0] ? (
                     <img
-  src={optimizeImageUrl(
-    product.images[0],
-    600
-  )}
-  alt={product.name}
-  loading={
-    index < 4
-      ? "eager"
-      : "lazy"
-  }
-  fetchPriority={
-    index < 4
-      ? "high"
-      : "auto"
-  }
-  decoding="async"
-/>
+                      src={optimizeImageUrl(product.images[0], 600)}
+                      alt={product.name}
+                      loading={index < 4 ? "eager" : "lazy"}
+                      fetchPriority={index < 4 ? "high" : "auto"}
+                      decoding="async"
+                    />
                   ) : (
                     <span>No image</span>
                   )}

@@ -13,8 +13,17 @@ export const AuthProvider = ({ children }) => {
       try {
         await ensureCsrfToken();
         const response = await api.post("/users/refresh");
-        setAccessToken(response.data.data.token);
-        setUser(response.data.data.user);
+
+        const session = response.data.data;
+
+        if (session?.authenticated === false || !session?.token || !session?.user) {
+          setAccessToken(null);
+          setUser(null);
+          return;
+        }
+
+        setAccessToken(session.token);
+        setUser(session.user);
       } catch {
         setAccessToken(null);
         setUser(null);

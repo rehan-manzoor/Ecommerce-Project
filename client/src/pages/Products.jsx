@@ -167,12 +167,8 @@ export default function Products() {
           ) : (
             <div className="products-grid">
               {products.map((product, index) => (
-  <ProductCard
-    key={product._id}
-    product={product}
-    priority={index < 4}
-  />
-))}
+                <ProductCard key={product._id} product={product} priority={index < 4} />
+              ))}
             </div>
           )}
 
@@ -201,28 +197,18 @@ export default function Products() {
   );
 }
 
-function ProductCard({
-  product,
-  priority = false,
-}) {
+function ProductCard({ product, priority = false }) {
   return (
     <Link className="product-card" to={`/products/${product._id}`}>
       <div className="product-image">
         {product.images?.[0] ? (
           <img
-  src={optimizeImageUrl(
-    product.images[0],
-    600
-  )}
-  alt={product.name}
-  loading={
-    priority ? "eager" : "lazy"
-  }
-  fetchPriority={
-    priority ? "high" : "auto"
-  }
-  decoding="async"
-/>
+            src={optimizeImageUrl(product.images[0], 600)}
+            alt={product.name}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            decoding="async"
+          />
         ) : (
           <span>No image</span>
         )}
