@@ -34,9 +34,21 @@ export const createCategory = async (req, res, next) => {
 
 export const getCategories = async (req, res, next) => {
   try {
-    const categories = await Category.find(
-      req.query.admin === "true" ? {} : { isActive: true }
-    ).sort({ name: 1 });
+    const isAdminRequest =
+  req.query.admin === "true";
+
+const categories = await Category.find(
+  isAdminRequest
+    ? {}
+    : { isActive: true }
+).sort({ name: 1 });
+
+if (!isAdminRequest) {
+  res.set(
+    "Cache-Control",
+    "public, s-maxage=300, stale-while-revalidate=600"
+  );
+}
     res.json({
       success: true,
       message: "Categories fetched",
