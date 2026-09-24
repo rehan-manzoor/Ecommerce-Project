@@ -123,6 +123,9 @@ export const getProducts = async (req, res, next) => {
   Product.countDocuments(filter),
 
   Product.find(filter)
+    .select(
+        "name slug description brand price salePrice stock images ratingsAverage numReviews category vendor createdAt"
+      )
     .populate("vendor", "storeName storeSlug logo")
     .populate("category", "name slug")
     .sort(sort)

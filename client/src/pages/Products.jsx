@@ -166,9 +166,13 @@ export default function Products() {
             </div>
           ) : (
             <div className="products-grid">
-              {products.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
+              {products.map((product, index) => (
+  <ProductCard
+    key={product._id}
+    product={product}
+    priority={index < 4}
+  />
+))}
             </div>
           )}
 
@@ -197,7 +201,10 @@ export default function Products() {
   );
 }
 
-function ProductCard({ product }) {
+function ProductCard({
+  product,
+  priority = false,
+}) {
   return (
     <Link className="product-card" to={`/products/${product._id}`}>
       <div className="product-image">
@@ -208,7 +215,12 @@ function ProductCard({ product }) {
     600
   )}
   alt={product.name}
-  loading="lazy"
+  loading={
+    priority ? "eager" : "lazy"
+  }
+  fetchPriority={
+    priority ? "high" : "auto"
+  }
   decoding="async"
 />
         ) : (

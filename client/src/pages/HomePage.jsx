@@ -121,7 +121,7 @@ export default function HomePage() {
           </div>
         ) : products.length ? (
           <div className="products-grid">
-            {products.map((product) => (
+            {products.map((product, index) => (
               <Link className="product-card" key={product._id} to={`/products/${product._id}`}>
                 <div className="product-image">
                   {product.images?.[0] ? (
@@ -131,7 +131,16 @@ export default function HomePage() {
     600
   )}
   alt={product.name}
-  loading="lazy"
+  loading={
+    index < 4
+      ? "eager"
+      : "lazy"
+  }
+  fetchPriority={
+    index < 4
+      ? "high"
+      : "auto"
+  }
   decoding="async"
 />
                   ) : (
